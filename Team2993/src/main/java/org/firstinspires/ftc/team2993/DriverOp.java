@@ -3,13 +3,17 @@ package org.firstinspires.ftc.team2993;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.team2993.structural.RobotHardware;
+import org.firstinspires.ftc.team2993.structural.Sensors;
 
 
 
 @TeleOp(name = "TeleOp", group="Regular")
 public class DriverOp extends OpMode
 {
-    RobotHardware robot;
+    private RobotHardware robot;
+
+    private final double threshhold = 0.2;
+    private final double speed = .5d;
 
     @Override
     public void init()
@@ -21,39 +25,50 @@ public class DriverOp extends OpMode
     @Override
     public void loop()
     {
-
+        driverOne();
     }
 
     @Override
     public void stop()
     {
-
+        robot.SetDrive(0,0);
     }
 
     public void driverOne()
     {
         double leftStick = gamepad1.left_stick_y;
         double rightStick = gamepad1.right_stick_y;
-        leftStick = (Math.abs(leftStick) > 0.05 ? leftStick : 0);
-        rightStick = (Math.abs(rightStick) > 0.05 ? rightStick : 0);
+        leftStick = (Math.abs(leftStick) > threshhold ? leftStick : 0);
+        rightStick = (Math.abs(rightStick) > threshhold ? rightStick : 0);
 
         robot.driveLeft(leftStick);
         robot.driveRight(rightStick);
+
+        if (gamepad1.b)
+            robot.SetArm(.25);
+        else if (gamepad1.x)
+            robot.SetArm(-.25);
+        else
+            robot.SetArm(0);
+
+        if (gamepad1.a || gamepad1.left_bumper)
+            robot.claw.setPosition(0);
+        else if (gamepad1.y || gamepad1.right_bumper)
+            robot.claw.setPosition(1);
+
+        if (gamepad1.dpad_down)
+            robot.sideArm.setPosition(-1);
+        else if (gamepad1.dpad_up)
+            robot.sideArm.setPosition(1);
     }
 
-    public void driverTwo()
+    public void telemetry(double msg)
     {
-        double power = (gamepad2.dpad_up ? 0.5 : (gamepad2.dpad_down ? -0.5 : 0));
-        robot.armL.setPower(power);
-        robot.armR.setPower(power);
-
-        if(gamepad2.a) robot.armServo.setPosition(robot.SERVO_CLOSED);
-        else if(gamepad2.b) robot.armServo.setPosition(robot.SERVO_OPEN);
+        telemetry.addData("%s", msg);
     }
 
-    public void telemetry(){
-
+    public void telemetry(String msg)
+    {
+        telemetry.addData("%s", msg);
     }
-
-
 }

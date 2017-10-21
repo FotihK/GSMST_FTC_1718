@@ -6,20 +6,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-
-
 public class RobotHardware
 {
     private HardwareMap map;
 
     public DcMotor fR, fL, bR, bL;
     public DcMotor armR, armL;
-    public Servo   armServo;
-
-    private final int CPR = 0;
-    private final double DIAMETER = 0;
-    private final double GEARING = 1;
-    private final double CPI = (CPR * GEARING) / (DIAMETER * Math.PI);
+    public Servo   claw, sideArm;
 
     public final double SERVO_OPEN = 0.1;
     public final double SERVO_CLOSED = 0.6;
@@ -43,10 +36,34 @@ public class RobotHardware
         fL.setDirection(DcMotorSimple.Direction.REVERSE);
         bL.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         armR.setDirection(DcMotorSimple.Direction.FORWARD);
         armL.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        resetEnc();
+        armR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        armL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        claw = map.get(Servo.class, "claw");
+        sideArm = map.get(Servo.class, "sidearm");
+
+        claw.scaleRange(.4, 1);
+    }
+
+    public void SetArm(double power)
+    {
+        power = Range.clip(power, -1d, 1d);
+        armL.setPower(power);
+        armR.setPower(power);
+    }
+
+    public void SetDrive(double powerLeft, double powerRight)
+    {
+        driveLeft(powerLeft);
+        driveRight(powerRight);
     }
 
     public void driveLeft(double power)
@@ -59,6 +76,7 @@ public class RobotHardware
     public void driveRight(double power)
     {
         power = Range.clip(power, -1d, 1d);
+
         fR.setPower(power);
         bR.setPower(power);
     }
@@ -67,29 +85,6 @@ public class RobotHardware
     {
         driveLeft(power);
         driveRight(power);
-    }
-
-    public void resetEnc()
-    {
-        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        fL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    public void driveDist(double dist, double power)
-    {
-        resetEnc();
-        fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        int counts = (int) (dist * CPI);
-        fL.setTargetPosition(counts);
-        fR.setTargetPosition(counts);
-
-        drive(power);
-        resetEnc();
     }
 
     public boolean isBusy(){
