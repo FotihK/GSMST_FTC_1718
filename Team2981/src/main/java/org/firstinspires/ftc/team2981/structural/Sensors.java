@@ -19,16 +19,25 @@ public class Sensors {
     }
 
     public void init(){
-        gyro = (ModernRoboticsI2cGyro) map.gyroSensor.get("gyro");
+        //gyro = (ModernRoboticsI2cGyro) map.gyroSensor.get("gyro");
         color = (ModernRoboticsI2cColorSensor) map.colorSensor.get("color");
     }
 
     public void calibrate(){
-        gyro.calibrate();
+        //gyro.calibrate();
+    }
+
+    public boolean isGyroCalibrating(){
+        //return gyro.isCalibrating();
+        return false;
+    }
+
+    public void resetGyro(){
+        //gyro.resetZAxisIntegrator();
     }
 
     public int getGyroHeading(){
-        return gyro.getHeading();
+        return gyro.getIntegratedZValue();
     }
 
     public int[] getRGB(){

@@ -14,17 +14,22 @@ public class RobotHardware {
 
     private HardwareMap map = null;
 
-    public DcMotor  fL = null, fR = null, bL = null, bR = null;                          //Drive Motors
-    public DcMotor  fourBar = null;                                                      //4-Bar motor
-    public Servo    claw = null;
+    public DcMotor  fL = null, fR = null;                          //Drive Motors
+    private DcMotor  fourBarLeft = null, fourBarRight = null;                                                      //4-Bar motor
+    private Servo    claw = null, jewel = null;
 
-    private final int CPR = 0;                                                          //encoder counts per revolution
-    private final double DIAMETER = 0;                                                  //encoded drive wheel circumference
-    private final double GEARING = 1;
-    private final double CPI = (CPR * GEARING) / (DIAMETER * Math.PI);
+    private static final int       CPR = 1120;                                                          //encoder counts per revolution
+    private static final double    DIAMETER = 4;                                                  //encoded drive wheel circumference
+    private static final double    GEARING = 2;
+    public static final double    CPI = (CPR * GEARING) / (DIAMETER * 3.14);
 
-    public final double claw_open = 0.1;
-    public final double claw_closed = 0.6;
+    private final double    CLAW_OPEN_VAL = 0;
+    private final double    CLAW_CLOSED_VAL = 0.65;
+    private final double    CLAW_CLOSED_MORE_VAL = 0.8;
+    private final double    JEWEL_UP = 0.12;
+    private final double    JEWEL_DOWN = 0.65;
+
+    private boolean clawClosed = false;
 
     public RobotHardware(HardwareMap map){
         this.map = map;
@@ -33,17 +38,26 @@ public class RobotHardware {
     public void init(){
         fL = map.get(DcMotor.class, "fL");
         fR = map.get(DcMotor.class, "fR");
-        bL = map.get(DcMotor.class, "bL");
-        bR = map.get(DcMotor.class, "bR");
 
-        fourBar = map.get(DcMotor.class, "fourBar");
+        fourBarLeft = map.get(DcMotor.class, "fourBarLeft");
+        fourBarRight = map.get(DcMotor.class, "fourBarRight");
 
-        fR.setDirection(DcMotorSimple.Direction.FORWARD);
-        bR.setDirection(DcMotorSimple.Direction.FORWARD);
-        fL.setDirection(DcMotorSimple.Direction.REVERSE);
-        bL.setDirection(DcMotorSimple.Direction.REVERSE);
+        claw = map.get(Servo.class, "claw");
+        jewel = map.get(Servo.class, "jewel");
 
-        fourBar.setDirection(DcMotorSimple.Direction.FORWARD);
+        fR.setDirection(DcMotorSimple.Direction.REVERSE);
+        fL.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        fourBarLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        fourBarRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fourBarLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fourBarRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        closeClaw();
+        jewelUp();
 
         resetEnc();
     }
@@ -51,18 +65,22 @@ public class RobotHardware {
     public void driveLeft(double power){
         power = Range.clip(power, -1, 1);
         fL.setPower(power);
-        bL.setPower(power);
     }
 
     public void driveRight(double power){
         power = Range.clip(power, -1, 1);
         fR.setPower(power);
-        bR.setPower(power);
     }
 
     public void drive(double power){
         driveLeft(power);
         driveRight(power);
+    }
+
+    public void fourBar(double power){
+        power = Range.clip(power, -1, 1);
+        fourBarLeft.setPower(power);
+        fourBarRight.setPower(power);
     }
 
     public void stop(){
@@ -73,12 +91,13 @@ public class RobotHardware {
         fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        fL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fourBarLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fourBarRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void driveDist(double dist, double power){
-        resetEnc();
         fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -90,8 +109,44 @@ public class RobotHardware {
         resetEnc();
     }
 
-    public boolean isBusy(){
+    public void turn(double power){     //positive for turn left, negative for turn right
+        driveLeft(-power);
+        driveRight(power);
+    }
+
+    public boolean driveIsBusy(){
         return fL.isBusy() || fR.isBusy();
+    }
+
+    public boolean fourBarIsBusy(){
+        return fourBarRight.isBusy() || fourBarLeft.isBusy();
+    }
+
+    public void closeClaw(){
+        claw.setPosition(CLAW_CLOSED_VAL);
+        clawClosed = true;
+    }
+
+    public void closeClawMore(){
+        claw.setPosition(CLAW_CLOSED_MORE_VAL);
+        clawClosed = true;
+    }
+
+    public void openClaw(){
+        claw.setPosition(CLAW_OPEN_VAL);
+        clawClosed = false;
+    }
+
+    public boolean isClawCloser(){
+        return clawClosed;
+    }
+
+    public void jewelDown(){
+        jewel.setPosition(JEWEL_DOWN);
+    }
+
+    public void jewelUp(){
+        jewel.setPosition(JEWEL_UP);
     }
 
 
