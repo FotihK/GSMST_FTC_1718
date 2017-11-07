@@ -20,9 +20,9 @@ public class DriverOp extends OpMode
     public void init()
     {
         robot = new RobotHardware(hardwareMap);
-        color = new Sensors(hardwareMap);
+        //color = new Sensors(hardwareMap);
         robot.init();
-        color.init();
+        //color.init();
     }
 
     @Override
@@ -48,9 +48,14 @@ public class DriverOp extends OpMode
         robot.driveRight(rightStick * speed);
 
         if (gamepad1.b)
-            robot.SetArm(.5);
+            robot.sideArm.setPosition(0);
         else if (gamepad1.x)
-            robot.SetArm(-.5);
+            robot.sideArm.setPosition(1);
+
+        if (gamepad1.b)
+            robot.SetArm(-.7);
+        else if (gamepad1.x)
+            robot.SetArm(.2);
         else
             robot.SetArm(0);
 
