@@ -7,11 +7,11 @@ import org.firstinspires.ftc.team2993.structural.Sensors;
 
 
 
-@TeleOp(name = "TeleOp", group="Regular")
+@TeleOp(name = "TeleOp - 2993", group="Regular")
 public class DriverOp extends OpMode
 {
     private RobotHardware robot;
-    public Sensors color;
+    private Sensors color;
 
     private final double threshhold = 0.1;
     private double speed = .5d;
@@ -20,9 +20,11 @@ public class DriverOp extends OpMode
     public void init()
     {
         robot = new RobotHardware(hardwareMap);
-        //color = new Sensors(hardwareMap);
+        color = new Sensors(hardwareMap);
         robot.init();
-        //color.init();
+        color.init();
+
+        robot.sideArm.setPosition(.5);
     }
 
     @Override
@@ -48,11 +50,6 @@ public class DriverOp extends OpMode
         robot.driveRight(rightStick * speed);
 
         if (gamepad1.b)
-            robot.sideArm.setPosition(0);
-        else if (gamepad1.x)
-            robot.sideArm.setPosition(1);
-
-        if (gamepad1.b)
             robot.SetArm(-.7);
         else if (gamepad1.x)
             robot.SetArm(.2);
@@ -62,20 +59,20 @@ public class DriverOp extends OpMode
         if (gamepad1.left_bumper)
             robot.claw.setPosition(0);
         else if (gamepad1.right_bumper)
-            robot.claw.setPosition(1);
-
-        if (gamepad1.dpad_down)
-            robot.sideArm.setPosition(.5);
-        else if (gamepad1.dpad_up)
-            robot.sideArm.setPosition(1);
+            robot.claw.setPosition(.75);
 
         if (gamepad1.a)
             speed = speed == 1d ? .5d : 1d;
     }
 
+    public int GetColor()
+    {
+        return color.color.red() - color.color.blue();
+    }
+
     public void telemetry(double msg)
     {
-        telemetry.addData("%s", msg);
+        telemetry.addLine(Double.toString(msg));
     }
 
     public void telemetry(String msg)

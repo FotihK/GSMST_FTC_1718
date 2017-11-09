@@ -16,9 +16,6 @@ public class RobotHardware
 
     public Sensors color;
 
-    public final double SERVO_OPEN = 0.1;
-    public final double SERVO_CLOSED = 0.6;
-
     public RobotHardware(HardwareMap _map){
         map = _map;
     }
@@ -49,9 +46,7 @@ public class RobotHardware
         claw = map.get(Servo.class, "claw");
         sideArm = map.get(Servo.class, "sidearm");
 
-        //claw.scaleRange(.4, 1);
-
-        //color = new Sensors(map);
+        color = new Sensors(map);
     }
 
     public void SetArm(double power)
@@ -88,7 +83,9 @@ public class RobotHardware
         driveRight(power);
     }
 
-    public boolean isBusy(){
-        return fL.isBusy() || fR.isBusy();
+    public void turn(double power)
+    {
+        driveRight(power);
+        driveLeft(-power);
     }
 }

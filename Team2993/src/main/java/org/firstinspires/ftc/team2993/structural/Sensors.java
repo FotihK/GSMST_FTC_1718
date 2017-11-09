@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Sensors
 {
-    private ModernRoboticsI2cColorSensor color;
+    public ModernRoboticsI2cColorSensor color;
     private HardwareMap map;
 
     public Sensors(HardwareMap map){
