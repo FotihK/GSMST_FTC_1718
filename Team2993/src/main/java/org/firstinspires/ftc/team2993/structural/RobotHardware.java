@@ -14,8 +14,7 @@ public class RobotHardware
     public DcMotor armR, armL;
     public Servo   claw, sideArm;
 
-    public final double SERVO_OPEN = 0.1;
-    public final double SERVO_CLOSED = 0.6;
+    public Sensors color;
 
     public RobotHardware(HardwareMap _map){
         map = _map;
@@ -23,34 +22,31 @@ public class RobotHardware
 
     public void init()
     {
-        fR = map.get(DcMotor.class, "fR");
-        fL = map.get(DcMotor.class, "fL");
-        bR = map.get(DcMotor.class, "bR");
-        bL = map.get(DcMotor.class, "bL");
+        fR = map.get(DcMotor.class, "fr");
+        fL = map.get(DcMotor.class, "fl");
+        bR = map.get(DcMotor.class, "bl");
+        bL = map.get(DcMotor.class, "br");
 
-        armR = map.get(DcMotor.class, "armL");
-        armL = map.get(DcMotor.class, "armR");
+        armR = map.get(DcMotor.class, "ar");
+        armL = map.get(DcMotor.class, "al");
 
         fR.setDirection(DcMotorSimple.Direction.FORWARD);
         bR.setDirection(DcMotorSimple.Direction.FORWARD);
         fL.setDirection(DcMotorSimple.Direction.REVERSE);
         bL.setDirection(DcMotorSimple.Direction.REVERSE);
+        armR.setDirection(DcMotorSimple.Direction.FORWARD);
+        armL.setDirection(DcMotorSimple.Direction.REVERSE);
 
         fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        armR.setDirection(DcMotorSimple.Direction.FORWARD);
-        armL.setDirection(DcMotorSimple.Direction.REVERSE);
-
         armR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         claw = map.get(Servo.class, "claw");
         sideArm = map.get(Servo.class, "sidearm");
 
-        claw.scaleRange(.4, 1);
+        color = new Sensors(map);
     }
 
     public void SetArm(double power)
@@ -87,7 +83,9 @@ public class RobotHardware
         driveRight(power);
     }
 
-    public boolean isBusy(){
-        return fL.isBusy() || fR.isBusy();
+    public void turn(double power)
+    {
+        driveRight(power);
+        driveLeft(-power);
     }
 }
