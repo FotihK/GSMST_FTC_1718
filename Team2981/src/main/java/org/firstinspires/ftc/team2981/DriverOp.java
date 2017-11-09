@@ -3,8 +3,11 @@ package org.firstinspires.ftc.team2981;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.team2981.structural.*;
+
+import static org.firstinspires.ftc.team2981.structural.RobotHardwareMec.SystemState.*;
 
 /**
  * Created by 200462069 on 10/14/2017.
@@ -12,7 +15,7 @@ import org.firstinspires.ftc.team2981.structural.*;
 
 @TeleOp(name = "TeleOp", group="Regular")
 public class DriverOp extends OpMode {
-    private RobotHardware robot;
+    private RobotHardwareMec robot;
     private Sensors sensors;
     private Vision vision;
 
@@ -26,7 +29,7 @@ public class DriverOp extends OpMode {
 
     @Override
     public void init() {
-        robot = new RobotHardware(hardwareMap);
+        robot = new RobotHardwareMec(hardwareMap);
         sensors = new Sensors(hardwareMap);
 
         robot.init();
@@ -34,6 +37,35 @@ public class DriverOp extends OpMode {
         vuf.start();
     }
 
+    @Override
+    public void loop(){
+        robot.drive(gamepad1);
+
+        if(gamepad1.left_bumper){
+            if(robot.getIntakeState() != FORWARD) robot.setIntake(FORWARD);
+            else robot.setIntake(OFF);
+        } else if(gamepad1.right_bumper){
+            if(robot.getIntakeState() != BACKWARD) robot.setIntake(BACKWARD);
+            else robot.setIntake(OFF);
+        }
+
+        if(gamepad2.left_bumper){
+            if(robot.getConveyorState() != FORWARD) robot.setConveyor(FORWARD);
+            else robot.setConveyor(OFF);
+        } else if(gamepad2.right_bumper){
+            if(robot.getConveyorState() != BACKWARD) robot.setConveyor(BACKWARD);
+            else robot.setConveyor(OFF);
+        }
+
+        if(gamepad2.dpad_up){
+            if(robot.getLiftState() != FORWARD) robot.setLift(FORWARD);
+            else robot.setLift(OFF);
+        } else if(gamepad2.dpad_down){
+            if(robot.getLiftState() != BACKWARD) robot.setLift(BACKWARD);
+            else robot.setLift(OFF);
+        }
+    }
+/*
     private void driverOne(){
         double leftStick = gamepad1.left_stick_y;
         double rightStick = gamepad1.right_stick_y;
@@ -58,7 +90,7 @@ public class DriverOp extends OpMode {
     }
 
     private void telemetry(){
-        /*
+
         telemetry.addData("VuMark ", "%s visible", vision.trackMark());
         telemetry.addData("Claw ", robot.isClawCloser() ? "is closed." : "is open.");
         OpenGLMatrix loc = vision.trackLocation();
@@ -71,7 +103,7 @@ public class DriverOp extends OpMode {
         if (rot != null) {
             telemetry.addData("Rotation: ", "(%f, %f, %f)", rot[0], rot[1], rot[2]);
         } else telemetry.addData("Rotation: ", "Unknown");
-        */
+
         telemetry.addData("RGB: ", "(%d, %d, %d)", sensors.getRGB()[0], sensors.getRGB()[1], sensors.getRGB()[2]);
     }
 
@@ -86,8 +118,5 @@ public class DriverOp extends OpMode {
     public void stop(){
         //vision.stop();
     }
-
-
-
-
+*/
 }
