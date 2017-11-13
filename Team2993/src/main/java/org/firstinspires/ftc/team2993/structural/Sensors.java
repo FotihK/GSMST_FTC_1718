@@ -8,8 +8,10 @@ public class Sensors
     public ModernRoboticsI2cColorSensor color;
     private HardwareMap map;
 
-    public Sensors(HardwareMap map){
-        this.map = map;
+    public Sensors(HardwareMap _map)
+    {
+        map = _map;
+        init();
     }
 
     public void init()

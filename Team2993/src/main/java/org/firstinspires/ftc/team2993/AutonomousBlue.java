@@ -3,55 +3,59 @@ package org.firstinspires.ftc.team2993;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.team2993.structural.RobotHardware;
 import org.firstinspires.ftc.team2993.structural.Sensors;
 
 
 
-@TeleOp(name="Auto - Blue", group="test")
+@TeleOp(name="Auto - Blue", group="blue")
 public class AutonomousBlue extends LinearOpMode
 {
     private RobotHardware robot;
     private Sensors color;
-    ElapsedTime eTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    int team = 1;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
         robot = new RobotHardware(hardwareMap);
         color = new Sensors(hardwareMap);
-        robot.init();
-        color.init();
 
-        robot.sideArm.setPosition(.5);
+        robot.sideArm.setPosition(0);
 
         waitForStart();
 
-        Wait(2000);
+        wait(2000);
         robot.sideArm.setPosition(1);
-        Wait(2000);
+        wait(2000);
 
         if (GetColor() > 0)
-            robot.turn(.25);
+            robot.turn(.25 * team);
         else
-            robot.turn(-.25);
-        Wait(500);
-        robot.sideArm.setPosition(.5);
-        wait(1000);
+            robot.turn(-.25 * team);
+        wait(200);
+
+        robot.clear();
+        robot.sideArm.setPosition(0);
+        wait(2000);
 
         robot.drive(.5);
-        Wait(2000);
+        wait(1000);
+
+        robot.clear();
+    }
+
+    public void wait (int ms)
+    {
+        timer.reset();
+        while(timer.time() < ms) { idle(); }
     }
 
     public int GetColor()
     {
         return color.color.red() - color.color.blue();
-    }
-
-    public void Wait (int ms)
-    {
-        eTime.reset();
-        while(eTime.time() < ms) {}
     }
 }
 

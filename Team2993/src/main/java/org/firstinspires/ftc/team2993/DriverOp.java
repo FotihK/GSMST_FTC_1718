@@ -3,7 +3,6 @@ package org.firstinspires.ftc.team2993;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.team2993.structural.RobotHardware;
-import org.firstinspires.ftc.team2993.structural.Sensors;
 
 
 
@@ -11,7 +10,6 @@ import org.firstinspires.ftc.team2993.structural.Sensors;
 public class DriverOp extends OpMode
 {
     private RobotHardware robot;
-    private Sensors color;
 
     private final double threshhold = 0.1;
     private double speed = .5d;
@@ -20,11 +18,8 @@ public class DriverOp extends OpMode
     public void init()
     {
         robot = new RobotHardware(hardwareMap);
-        color = new Sensors(hardwareMap);
-        robot.init();
-        color.init();
 
-        robot.sideArm.setPosition(.5);
+        robot.sideArm.setPosition(1);
     }
 
     @Override
@@ -50,33 +45,18 @@ public class DriverOp extends OpMode
         robot.driveRight(rightStick * speed);
 
         if (gamepad1.b)
-            robot.SetArm(-.7);
+            robot.SetArm(-.6);
         else if (gamepad1.x)
-            robot.SetArm(.2);
+            robot.SetArm(.3);
         else
             robot.SetArm(0);
 
         if (gamepad1.left_bumper)
             robot.claw.setPosition(0);
         else if (gamepad1.right_bumper)
-            robot.claw.setPosition(.75);
+            robot.claw.setPosition(1);
 
         if (gamepad1.a)
             speed = speed == 1d ? .5d : 1d;
-    }
-
-    public int GetColor()
-    {
-        return color.color.red() - color.color.blue();
-    }
-
-    public void telemetry(double msg)
-    {
-        telemetry.addLine(Double.toString(msg));
-    }
-
-    public void telemetry(String msg)
-    {
-        telemetry.addData("%s", msg);
     }
 }

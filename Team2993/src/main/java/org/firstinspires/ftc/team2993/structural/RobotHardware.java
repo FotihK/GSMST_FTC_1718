@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 public class RobotHardware
@@ -16,16 +17,18 @@ public class RobotHardware
 
     public Sensors color;
 
-    public RobotHardware(HardwareMap _map){
+    public RobotHardware(HardwareMap _map)
+    {
         map = _map;
+        init();
     }
 
     public void init()
     {
         fR = map.get(DcMotor.class, "fr");
         fL = map.get(DcMotor.class, "fl");
-        bR = map.get(DcMotor.class, "bl");
-        bL = map.get(DcMotor.class, "br");
+        bR = map.get(DcMotor.class, "br");
+        bL = map.get(DcMotor.class, "bl");
 
         armR = map.get(DcMotor.class, "ar");
         armL = map.get(DcMotor.class, "al");
@@ -45,6 +48,9 @@ public class RobotHardware
 
         claw = map.get(Servo.class, "claw");
         sideArm = map.get(Servo.class, "sidearm");
+
+        sideArm.scaleRange(.52, 1);
+        sideArm.setPosition(0);
 
         color = new Sensors(map);
     }
@@ -87,5 +93,10 @@ public class RobotHardware
     {
         driveRight(power);
         driveLeft(-power);
+    }
+
+    public void clear()
+    {
+        drive(0);
     }
 }
