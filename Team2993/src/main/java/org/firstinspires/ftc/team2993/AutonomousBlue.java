@@ -32,16 +32,16 @@ public class AutonomousBlue extends LinearOpMode
         wait(2000);
 
         if (GetColor() > 0)
-            robot.turn(.25 * team);
+            robot.Turn(.25 * team);
         else
-            robot.turn(-.25 * team);
+            robot.Turn(-.25 * team);
         wait(200);
 
         robot.clear();
         robot.sideArm.setPosition(0);
         wait(2000);
 
-        robot.drive(.5);
+        robot.Drive(.5);
         wait(1000);
 
         robot.clear();

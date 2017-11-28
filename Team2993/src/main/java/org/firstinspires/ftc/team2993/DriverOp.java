@@ -41,8 +41,8 @@ public class DriverOp extends OpMode
         leftStick = (Math.abs(leftStick) > threshhold ? leftStick : 0);
         rightStick = (Math.abs(rightStick) > threshhold ? rightStick : 0);
 
-        robot.driveLeft(leftStick * speed);
-        robot.driveRight(rightStick * speed);
+        robot.SetLeft(leftStick * speed);
+        robot.SetRight(rightStick * speed);
 
         if (gamepad1.b)
             robot.SetArm(-.6);
@@ -52,9 +52,9 @@ public class DriverOp extends OpMode
             robot.SetArm(0);
 
         if (gamepad1.left_bumper)
-            robot.claw.setPosition(0);
+            robot.SetClaw(-.3f);
         else if (gamepad1.right_bumper)
-            robot.claw.setPosition(1);
+            robot.SetClaw(.3f);
 
         if (gamepad1.a)
             speed = speed == 1d ? .5d : 1d;
