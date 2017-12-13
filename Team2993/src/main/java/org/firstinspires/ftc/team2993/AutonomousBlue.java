@@ -31,17 +31,20 @@ public class AutonomousBlue extends LinearOpMode
         robot.sideArm.setPosition(1);
         wait(2000);
 
+        telemetry.addLine(String.valueOf(color.GetColor()));
+        telemetry.update();
+
         if (color.GetColor() > 0)
-            robot.Turn(.25 * team);
+            robot.Drive(.25 * team);
         else
-            robot.Turn(-.25 * team);
-        wait(200);
+            robot.Drive(-.25 * team);
+        wait(500);
 
         robot.clear();
         robot.sideArm.setPosition(0);
-        wait(2000);
+        wait(1000);
 
-        robot.Drive(.5);
+        //robot.Drive(.5);
         wait(1000);
 
         robot.clear();

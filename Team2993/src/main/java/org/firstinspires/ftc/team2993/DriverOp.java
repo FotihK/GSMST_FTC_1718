@@ -61,7 +61,7 @@ public class DriverOp extends OpMode
             robot.SetClaw(0f);
 
         if (gamepad1.a)
-            speed = speed == 1d ? .5d : 1d;
+            speed = speed == 1d ? .3d : 1d;
 
 
 
