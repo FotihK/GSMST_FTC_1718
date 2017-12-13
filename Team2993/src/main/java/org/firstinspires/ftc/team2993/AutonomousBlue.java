@@ -31,7 +31,7 @@ public class AutonomousBlue extends LinearOpMode
         robot.sideArm.setPosition(1);
         wait(2000);
 
-        if (GetColor() > 0)
+        if (color.GetColor() > 0)
             robot.Turn(.25 * team);
         else
             robot.Turn(-.25 * team);
@@ -53,9 +53,6 @@ public class AutonomousBlue extends LinearOpMode
         while(timer.time() < ms) { idle(); }
     }
 
-    public int GetColor()
-    {
-        return color.color.red() - color.color.blue();
-    }
+
 }
 

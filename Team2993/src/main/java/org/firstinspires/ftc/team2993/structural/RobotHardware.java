@@ -25,10 +25,10 @@ public class RobotHardware
 
     public void init()
     {
-        fR = map.get(DcMotor.class, "fr");
-        fL = map.get(DcMotor.class, "fl");
-        bR = map.get(DcMotor.class, "br");
-        bL = map.get(DcMotor.class, "bl");
+        fR = map.get(DcMotor.class, "fl");
+        fL = map.get(DcMotor.class, "fr");
+        bR = map.get(DcMotor.class, "bl");
+        bL = map.get(DcMotor.class, "br");
         armR = map.get(DcMotor.class, "ar");
         armL = map.get(DcMotor.class, "al");
         clawR = map.get(DcMotor.class, "cr");
@@ -38,8 +38,8 @@ public class RobotHardware
         bR.setDirection(DcMotorSimple.Direction.FORWARD);
         fL.setDirection(DcMotorSimple.Direction.REVERSE);
         bL.setDirection(DcMotorSimple.Direction.REVERSE);
-        armR.setDirection(DcMotorSimple.Direction.FORWARD);
-        armL.setDirection(DcMotorSimple.Direction.REVERSE);
+        armR.setDirection(DcMotorSimple.Direction.REVERSE);
+        armL.setDirection(DcMotorSimple.Direction.FORWARD);
         clawR.setDirection(DcMotorSimple.Direction.FORWARD);
         clawL.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -53,10 +53,8 @@ public class RobotHardware
 
         sideArm = map.get(Servo.class, "sidearm");
 
-        sideArm.scaleRange(.52, 1);
+        sideArm.scaleRange(.5, 1);
         sideArm.setPosition(0);
-
-        color = new Sensors(map);
     }
 
     public void SetClaw(double power)

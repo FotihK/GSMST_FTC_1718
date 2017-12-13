@@ -18,4 +18,9 @@ public class Sensors
     {
         color = (ModernRoboticsI2cColorSensor) map.colorSensor.get("color");
     }
+
+    public int GetColor()
+    {
+        return color.red() - color.blue();
+    }
 }
