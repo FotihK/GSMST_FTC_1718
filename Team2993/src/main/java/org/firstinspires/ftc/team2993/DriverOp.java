@@ -6,7 +6,6 @@ import org.firstinspires.ftc.team2993.structural.RobotHardware;
 import org.firstinspires.ftc.team2993.structural.Sensors;
 
 
-
 @TeleOp(name = "TeleOp - 2993", group="Regular")
 public class DriverOp extends OpMode
 {
@@ -21,10 +20,8 @@ public class DriverOp extends OpMode
     {
         robot = new RobotHardware(hardwareMap);
         color = new Sensors(hardwareMap);
-        robot.init();
-        color.init();
 
-        robot.sideArm.setPosition(.5);
+        //robot.sideArm.setPosition(1);
     }
 
     @Override
@@ -46,37 +43,32 @@ public class DriverOp extends OpMode
         leftStick = (Math.abs(leftStick) > threshhold ? leftStick : 0);
         rightStick = (Math.abs(rightStick) > threshhold ? rightStick : 0);
 
-        robot.driveLeft(leftStick * speed);
-        robot.driveRight(rightStick * speed);
+        robot.SetLeft(leftStick * speed);
+        robot.SetRight(rightStick * speed);
 
-        if (gamepad1.b)
-            robot.SetArm(-.7);
+        if      (gamepad1.b)
+            robot.SetArm(-.6);
         else if (gamepad1.x)
-            robot.SetArm(.2);
+            robot.SetArm(.3);
         else
             robot.SetArm(0);
 
-        if (gamepad1.left_bumper)
-            robot.claw.setPosition(0);
+        if      (gamepad1.left_bumper)
+            robot.SetClaw(-.3f);
         else if (gamepad1.right_bumper)
-            robot.claw.setPosition(.75);
+            robot.SetClaw(.3f);
+        else
+            robot.SetClaw(0f);
 
         if (gamepad1.a)
-            speed = speed == 1d ? .5d : 1d;
-    }
+            speed = speed == 1d ? .3d : 1d;
 
-    public int GetColor()
-    {
-        return color.color.red() - color.color.blue();
-    }
 
-    public void telemetry(double msg)
-    {
-        telemetry.addLine(Double.toString(msg));
-    }
 
-    public void telemetry(String msg)
-    {
-        telemetry.addData("%s", msg);
+        if (gamepad1.y)
+        {
+            telemetry.addLine(String.valueOf(color.GetColor()));
+            telemetry.update();
+        }
     }
 }
