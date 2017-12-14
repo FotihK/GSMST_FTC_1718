@@ -44,9 +44,6 @@ public class AutonomousBlue extends LinearOpMode
         robot.sideArm.setPosition(0);
         wait(1000);
 
-        //robot.Drive(.5);
-        wait(1000);
-
         robot.clear();
     }
 
@@ -55,7 +52,4 @@ public class AutonomousBlue extends LinearOpMode
         timer.reset();
         while(timer.time() < ms) { idle(); }
     }
-
-
 }
-
