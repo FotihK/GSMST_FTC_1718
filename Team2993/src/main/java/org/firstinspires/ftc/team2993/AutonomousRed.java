@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class AutonomousRed extends AutonomousBlue
 {
     @Override
-    public void runOpMode() throws InterruptedException
+    public void runOpMode()
     {
         team = -1;
         super.runOpMode();

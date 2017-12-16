@@ -18,7 +18,7 @@ public class AutonomousBlue extends LinearOpMode
     int team = 1;
 
     @Override
-    public void runOpMode() throws InterruptedException
+    public void runOpMode()
     {
         robot = new RobotHardware(hardwareMap);
         color = new Sensors(hardwareMap);
@@ -48,6 +48,8 @@ public class AutonomousBlue extends LinearOpMode
         robot.sideArm.setPosition(0);
         wait(1000);
 
+        // HOLA,MEINE NAME IS JACE KIM.OHAYOO Watashi wa Jace desu.
+
         robot.clear();
     }
 
@@ -56,6 +58,4 @@ public class AutonomousBlue extends LinearOpMode
         timer.reset();
         while(timer.time() < ms) { idle(); }
     }
-
-
 }

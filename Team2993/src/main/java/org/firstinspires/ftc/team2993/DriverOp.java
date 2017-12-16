@@ -64,7 +64,7 @@ public class DriverOp extends OpMode
         else if (gamepad1.right_bumper)
             ClawSpeed = .3d;
         else if (!clawOff)
-            ClawSpeed = .05d;
+            ClawSpeed = .1d;
         else if (clawOff)
             ClawSpeed = 0d;
 
@@ -73,18 +73,18 @@ public class DriverOp extends OpMode
         if (gamepad1.dpad_left && timer.time() > 250)
         {
             timer.reset();
-            clawOff = !clawOff;
+            robot.sideArm.setPosition(0);
         }
 
         if (gamepad1.a && timer.time() > 500)
         {
             timer.reset();
-            speed = speed == 1d ? .5d : 1d;
+            speed = speed == .5d ? .25d : .5d;
         }
 
 
 
-        if (gamepad1.y)                                                                             // Debug
+        if (gamepad1.y)   // Debug
         {
             telemetry.addLine(String.valueOf(color.GetColor()));
             telemetry.addLine(String.valueOf(gamepad1.left_trigger));
