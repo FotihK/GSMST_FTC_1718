@@ -21,8 +21,8 @@ public class DriverOp extends OpMode {
         robot.init();
     }
     private void driverOne(){
-        double rightStick = gamepad1.left_stick_y;
-        double leftStick = gamepad1.right_stick_y;
+        double rightStick = gamepad1.right_stick_y;
+        double leftStick = gamepad1.left_stick_y;
         leftStick = (Math.abs(leftStick) > 0.05 ? (leftStick) : 0);
         rightStick = (Math.abs(rightStick) > 0.05 ? (rightStick) : 0);
         robot.driveLeft(rightStick);
@@ -30,17 +30,19 @@ public class DriverOp extends OpMode {
     }
 
     private void driverTwo() {
-        double leftStick = gamepad2.left_stick_y;
+        double leftStick = -gamepad2.left_stick_y;
         leftStick = (Math.abs(leftStick) > 0.1 ? (leftStick): 0);
         robot.lift(leftStick);
         if(gamepad2.left_bumper) robot.openClaw();
         else if(gamepad2.right_bumper) robot.closeClaw();
-        if(gamepad2.a) robot.jewelUp();
-        else if(gamepad2.b) robot.jewelDown();
+        if(gamepad2.dpad_up) robot.jewelUp();
+        else if(gamepad2.dpad_down) robot.jewelDown();
+        else if(gamepad2.dpad_left) robot.jewelMid();
     }
 
     @Override
     public void loop() {
         driverOne();
+        driverTwo();
     }
 }

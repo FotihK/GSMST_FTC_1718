@@ -24,11 +24,11 @@ public class RobotHardware {
     private static final double    GEARING = 2;
     public static final double    CPI = (CPR * GEARING) / (DIAMETER * 3.14);
 
-    private final double    CLAW_OPEN_VAL = 0;
-    private final double    CLAW_CLOSED_VAL = 0.65;
-    private final double    CLAW_CLOSED_MORE_VAL = 0.8;
-    private final double    JEWEL_UP = 0.65;
-    private final double    JEWEL_DOWN = 0.12;
+    private final double    CLAW_OPEN_VAL = 0.6;
+    private final double    CLAW_CLOSED_VAL = 0.1;
+    private final double    JEWEL_UP = 0.5;
+    private final double    JEWEL_DOWN = 0;
+    private final double    JEWEL_MID = .3;
 
     private boolean clawClosed = false;
 
@@ -93,11 +93,6 @@ public class RobotHardware {
         clawClosed = true;
     }
 
-    public void closeClawMore(){
-        claw.setPosition(CLAW_CLOSED_MORE_VAL);
-        clawClosed = true;
-    }
-
     public void openClaw(){
         claw.setPosition(CLAW_OPEN_VAL);
         clawClosed = false;
@@ -115,5 +110,6 @@ public class RobotHardware {
         jewel.setPosition(JEWEL_UP);
     }
 
+    public void jewelMid() { jewel.setPosition(JEWEL_MID); }
 
 }
