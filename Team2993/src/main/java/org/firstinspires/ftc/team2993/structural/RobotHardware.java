@@ -53,7 +53,7 @@ public class RobotHardware
 
         sideArm = map.get(Servo.class, "sidearm");
 
-        sideArm.scaleRange(.45, 1);
+        sideArm.scaleRange(.5, 1);
         sideArm.setPosition(0);
     }
 
