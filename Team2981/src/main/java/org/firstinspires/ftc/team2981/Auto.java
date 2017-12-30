@@ -30,6 +30,7 @@ public class Auto extends LinearOpMode {
     private ElapsedTime meaner = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private ElapsedTime runtime = new ElapsedTime();
 
+
     public void initialize() {
         robot = new RobotHardwareMec(hardwareMap);
         sensors = new Sensors(hardwareMap);

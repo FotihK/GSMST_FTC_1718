@@ -12,41 +12,56 @@ public class RobotHardware
 
     public DcMotor fR, fL, bR, bL;
     public DcMotor armR, armL;
-    public Servo   claw, sideArm;
+    public DcMotor clawR, clawL;
+    public Servo   sideArm;
 
     public Sensors color;
 
-    public RobotHardware(HardwareMap _map){
+    public RobotHardware(HardwareMap _map)
+    {
         map = _map;
+        init();
     }
 
     public void init()
     {
-        fR = map.get(DcMotor.class, "fr");
-        fL = map.get(DcMotor.class, "fl");
+        fR = map.get(DcMotor.class, "fl");
+        fL = map.get(DcMotor.class, "fr");
         bR = map.get(DcMotor.class, "bl");
         bL = map.get(DcMotor.class, "br");
-
         armR = map.get(DcMotor.class, "ar");
         armL = map.get(DcMotor.class, "al");
+        clawR = map.get(DcMotor.class, "cr");
+        clawL = map.get(DcMotor.class, "cl");
 
         fR.setDirection(DcMotorSimple.Direction.FORWARD);
         bR.setDirection(DcMotorSimple.Direction.FORWARD);
         fL.setDirection(DcMotorSimple.Direction.REVERSE);
         bL.setDirection(DcMotorSimple.Direction.REVERSE);
-        armR.setDirection(DcMotorSimple.Direction.FORWARD);
-        armL.setDirection(DcMotorSimple.Direction.REVERSE);
+        armR.setDirection(DcMotorSimple.Direction.REVERSE);
+        armL.setDirection(DcMotorSimple.Direction.FORWARD);
+        clawR.setDirection(DcMotorSimple.Direction.FORWARD);
+        clawL.setDirection(DcMotorSimple.Direction.REVERSE);
 
         fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        clawR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        clawL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        claw = map.get(Servo.class, "claw");
         sideArm = map.get(Servo.class, "sidearm");
 
-        color = new Sensors(map);
+        sideArm.scaleRange(.5, 1);
+        sideArm.setPosition(0);
+    }
+
+    public void SetClaw(double power)
+    {
+        power = Range.clip(power, -1d, 1d);
+        clawR.setPower(power);
+        clawL.setPower(power);
     }
 
     public void SetArm(double power)
@@ -56,20 +71,30 @@ public class RobotHardware
         armR.setPower(power);
     }
 
-    public void SetDrive(double powerLeft, double powerRight)
+    public void Turn(double power)
     {
-        driveLeft(powerLeft);
-        driveRight(powerRight);
+        SetDrive(power, -power);
     }
 
-    public void driveLeft(double power)
+    public void Drive(double power)
+    {
+        SetDrive(power, power);
+    }
+
+    public void SetDrive(double powerLeft, double powerRight)
+    {
+        SetLeft(powerLeft);
+        SetRight(powerRight);
+    }
+
+    public void SetLeft(double power)
     {
         power = Range.clip(power, -1d, 1d);
         fL.setPower(power);
         bL.setPower(power);
     }
 
-    public void driveRight(double power)
+    public void SetRight(double power)
     {
         power = Range.clip(power, -1d, 1d);
 
@@ -77,15 +102,8 @@ public class RobotHardware
         bR.setPower(power);
     }
 
-    public void drive(double power)
+    public void clear()
     {
-        driveLeft(power);
-        driveRight(power);
-    }
-
-    public void turn(double power)
-    {
-        driveRight(power);
-        driveLeft(-power);
+        SetDrive(0, 0);
     }
 }
