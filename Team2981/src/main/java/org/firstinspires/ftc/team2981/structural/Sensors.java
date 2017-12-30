@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team2981.structural;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,7 +11,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Sensors {
 
-    private ModernRoboticsI2cGyro gyro = null;
+    //private BNO055IMU gyro = null;
     private ModernRoboticsI2cColorSensor color = null;
     private HardwareMap map = null;
 
@@ -19,7 +20,7 @@ public class Sensors {
     }
 
     public void init(){
-        //gyro = (ModernRoboticsI2cGyro) map.gyroSensor.get("gyro");
+        //gyro = (BNO055IMU) map.gyroSensor.get("gyro");
         color = (ModernRoboticsI2cColorSensor) map.colorSensor.get("color");
     }
 
@@ -36,12 +37,13 @@ public class Sensors {
         //gyro.resetZAxisIntegrator();
     }
 
-    public int getGyroHeading(){
-        return gyro.getIntegratedZValue();
-    }
+    //public int getGyroHeading(){
+        //return gyro.getIntegratedZValue();
+
+    //}
 
     public int[] getRGB(){
-        return new int[] {color.red(), color.blue(), color.green()};
+        return new int[] {color.red(), color.green(), color.blue()};
     }
 
 
