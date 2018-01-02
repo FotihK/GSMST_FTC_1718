@@ -2,94 +2,169 @@ package org.firstinspires.ftc.team2993;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.team2993.structural.RobotHardware;
-import org.firstinspires.ftc.team2993.structural.Sensors;
+import org.firstinspires.ftc.team2993.Hardware.*;
+
 
 
 @TeleOp(name = "TeleOp - 2993", group="Regular")
 public class DriverOp extends OpMode
 {
-    private RobotHardware robot;
-    private Sensors color;
+    //
+    // Configuration variables
+    //
 
-    private final double threshhold = 0.1;
-    private double speed = .5d;
-    private double ClawSpeed = 0d;
-    private boolean clawOff = true;
+    public final double JOYSTICK_THRESHOLD = .1d;
+    public final double MOTOR_SPEED        = .5d;
 
-    ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+    public final double LIFT_SPEED_UP      = .5d;
+    public final double LIFT_SPEED_DOWN    = .5d;
+
+    public final double ARM_SPEED_UP       = .5d;
+    public final double ARM_SPEED_DOWN     = .5d;
+
+
+
+    //
+    // Program variables
+    //
+
+    private RobotHardware Robot;
+    
+    private double  liftSpeed = 0d;
+    private double  armSpeed  = 0d;
+
+    private boolean intakeOn         = false;
+    private boolean intakeButtonHeld = false;
+
+    private boolean clawClosed     = false;
+    private boolean clawButtonHeld = false;
+
+
 
     @Override
     public void init()
     {
-        robot = new RobotHardware(hardwareMap);
-        color = new Sensors(hardwareMap);
+        Robot = new RobotHardware(hardwareMap);
 
-        robot.sideArm.setPosition(0);
+        Robot.sideArm.setPosition(0);
     }
 
     @Override
     public void loop()
     {
-        driverOne();
+        DriverOne();
+        DriverTwo();
     }
 
     @Override
     public void stop()
     {
-        robot.SetDrive(0,0);
+        Robot.SetMotors(0,0);
     }
 
-    public void driverOne()
+    public void DriverOne()
     {
-        double leftStick = gamepad1.left_stick_y;
-        double rightStick = gamepad1.right_stick_y;
-        leftStick = (Math.abs(leftStick) > threshhold ? leftStick : 0);
-        rightStick = (Math.abs(rightStick) > threshhold ? rightStick : 0);
+        double leftX  = gamepad1.left_stick_x;
+        double leftY  = gamepad1.left_stick_y;
+        double rightX = gamepad1.right_stick_x;
 
-        robot.SetLeft(leftStick * speed);
-        robot.SetRight(rightStick * speed);
+        double leftMagnitude = Math.sqrt(leftX * leftX + leftY * leftY);
 
-        if      (gamepad1.b)
-            robot.SetArm(-.6d);
-        else if (gamepad1.x)
-            robot.SetArm(.3d);
+        if      (leftMagnitude > JOYSTICK_THRESHOLD)
+        {
+            double leftTheta = Math.atan2(leftY, leftX) * 180 / Math.PI;
+            leftTheta -= 22.5d;                                                                     // Rotate configuration 1/16 rotation clockwise
+
+            int sector = (int) Math.floor(leftTheta / 45d);
+            switch (sector)
+            {
+                case 0:
+                    Robot.SetMotors(MOTOR_SPEED, -MOTOR_SPEED, -MOTOR_SPEED, MOTOR_SPEED);
+                    break;
+                case 1:
+                    Robot.SetMotors(MOTOR_SPEED, 0d, 0d, MOTOR_SPEED);
+                    break;
+                case 2:
+                    Robot.SetMotors(MOTOR_SPEED, MOTOR_SPEED, MOTOR_SPEED, MOTOR_SPEED);
+                    break;
+                case 3:
+                    Robot.SetMotors(0d, MOTOR_SPEED, MOTOR_SPEED, 0d);
+                    break;
+                case 4:
+                    Robot.SetMotors(-MOTOR_SPEED, MOTOR_SPEED, MOTOR_SPEED, -MOTOR_SPEED);
+                    break;
+                case 5:
+                    Robot.SetMotors(0d, -MOTOR_SPEED, -MOTOR_SPEED, 0d);
+                    break;
+                case 6:
+                    Robot.SetMotors(-MOTOR_SPEED, -MOTOR_SPEED, -MOTOR_SPEED, -MOTOR_SPEED);
+                    break;
+                case 7:
+                    Robot.SetMotors(-MOTOR_SPEED, 0d, 0d, -MOTOR_SPEED);
+                    break;
+            }
+        }
+        else if (rightX > JOYSTICK_THRESHOLD)
+            Robot.SetMotors(MOTOR_SPEED  * rightX, -MOTOR_SPEED * rightX);
         else
-            robot.SetArm(0);
+            Robot.SetMotors(0d);
+    }
 
-        if      (gamepad1.left_bumper)
-            ClawSpeed = -.3d;
-        else if (gamepad1.right_bumper)
-            ClawSpeed = .3d;
-        else if (!clawOff)
-            ClawSpeed = .1d;
-        else if (clawOff)
-            ClawSpeed = 0d;
+    public void DriverTwo()
+    {
+        double leftY  = gamepad2.left_stick_y;
+        double rightY = gamepad2.right_stick_y;
 
-        robot.SetClaw(ClawSpeed);
 
-        if (gamepad1.dpad_left && timer.time() > 250)
+
+        if      (leftY > JOYSTICK_THRESHOLD)
+            armSpeed = ARM_SPEED_UP * leftY;
+        else if (leftY < -JOYSTICK_THRESHOLD)
+            armSpeed = ARM_SPEED_DOWN * leftY;
+        else
+            armSpeed = 0d;
+
+        Robot.SetArm(armSpeed);
+
+
+
+        if      (gamepad2.b)
+            liftSpeed = LIFT_SPEED_UP;
+        else if (gamepad2.y)
+            liftSpeed = -LIFT_SPEED_DOWN;
+        else if (rightY > JOYSTICK_THRESHOLD)
+            liftSpeed = LIFT_SPEED_UP * rightY;
+        else if (rightY < -JOYSTICK_THRESHOLD)
+            liftSpeed = LIFT_SPEED_DOWN * rightY;
+        else
+            liftSpeed = 0d;
+
+        Robot.SetLift(liftSpeed);
+
+
+
+        if ((gamepad2.right_bumper || gamepad2.y) && !clawButtonHeld)                               // Toggle claw
         {
-            timer.reset();
-            robot.sideArm.setPosition(0);
+            clawClosed = !clawClosed;
+            Robot.SetClaw(clawClosed);
+            clawButtonHeld = true;
         }
+        else if (!(gamepad2.right_bumper || gamepad2.y))
+            clawButtonHeld = false;
 
-        if (gamepad1.a && timer.time() > 500)
+
+
+        if (gamepad2.left_bumper && !intakeButtonHeld)                                              // Toggle intake
         {
-            timer.reset();
-            speed = speed == .5d ? .25d : .5d;
+            intakeOn = !intakeOn;
+            Robot.SetInake(intakeOn);
+            intakeButtonHeld = true;
         }
+        else if (!gamepad2.left_bumper)
+            intakeButtonHeld = false;
 
-
-
-        if (gamepad1.y)   // Debug
-        {
-            telemetry.addLine(String.valueOf(color.GetColor()));
-            telemetry.addLine(String.valueOf(gamepad1.left_trigger));
-            telemetry.addLine(String.valueOf(getRuntime()));
-            telemetry.update();
-        }
+        if (gamepad2.dpad_up)
+            Robot.sideArm.setPosition(0d);
     }
 }
