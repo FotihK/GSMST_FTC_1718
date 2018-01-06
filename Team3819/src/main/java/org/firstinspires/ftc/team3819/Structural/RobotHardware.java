@@ -16,7 +16,7 @@ public class RobotHardware {
     private HardwareMap map = null;
 
     public DcMotor  fL = null, fR = null;                          //Drive Motors
-    private DcMotor  lift = null;
+    private DcMotor  lift = null, rotor = null;
     private Servo    claw = null, jewel = null;
 
     private static final int       CPR = 1120;                                                          //encoder counts per revolution
@@ -25,10 +25,10 @@ public class RobotHardware {
     public static final double    CPI = (CPR * GEARING) / (DIAMETER * 3.14);
 
     private final double    CLAW_OPEN_VAL = 0.6;
-    private final double    CLAW_CLOSED_VAL = 0.1;
-    private final double    JEWEL_UP = 0.5;
-    private final double    JEWEL_DOWN = 0;
-    private final double    JEWEL_MID = .3;
+    private final double    CLAW_CLOSED_VAL = 0.2;
+    private final double    JEWEL_UP = 0;
+    private final double    JEWEL_DOWN = .5;
+    private final double    JEWEL_MID = .25;
 
     private boolean clawClosed = false;
 
@@ -41,28 +41,35 @@ public class RobotHardware {
         fR = map.get(DcMotor.class, "fR");
 
         lift = map.get(DcMotor.class, "lift");
+        rotor = map.get(DcMotor.class, "rotor");
 
         claw = map.get(Servo.class, "claw");
         jewel = map.get(Servo.class, "jewel");
 
-        fR.setDirection(DcMotorSimple.Direction.REVERSE);
-        fL.setDirection(DcMotorSimple.Direction.FORWARD);
+        fR.setDirection(DcMotorSimple.Direction.FORWARD);
+        fL.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        lift.setDirection(DcMotorSimple.Direction.REVERSE);
+        lift.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        closeClaw();
-        jewelUp();
+
 
     }
 
     public void lift(double power) {
         power = Range.clip(power, -1, 1);
-        lift.setPower(power);
+        if(power>0)
+            lift.setPower(power/7);
+        else
+            lift.setPower(power/1.5);
     }
 
-    public void driveLeft(double power){
+    public void rotor(double power) {
         power = Range.clip(power, -1, 1);
-        fL.setPower(power);
+        rotor.setPower(power);
+    }
+    public void driveLeft(double power) {
+        power = Range.clip(power, -1, 1);
+            fL.setPower(power);
     }
 
     public void driveRight(double power){
