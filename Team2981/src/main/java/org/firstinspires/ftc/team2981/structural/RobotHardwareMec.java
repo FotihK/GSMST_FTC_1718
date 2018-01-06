@@ -23,26 +23,30 @@ public class RobotHardwareMec {
     private DcMotor fL = null, fR = null, bL = null, bR = null;
     private CRServo intakeLeft = null, intakeRight = null;
     private DcMotor conveyorLeft = null, conveyorRight = null;
-    //private DcMotor lift = null;
+    private DcMotor liftLeft = null;
+    private DcMotor liftRight = null;
     private Servo jewel = null;
 
     private SystemState intakeLeftState = SystemState.OFF;
     private SystemState intakeRightState = SystemState.OFF;
     private SystemState conveyorLeftState = SystemState.OFF;
     private SystemState conveyorRightState = SystemState.OFF;
-    //private SystemState liftState = SystemState.OFF;
+    private SystemState liftLeftState = SystemState.OFF;
+    private SystemState liftRightState = SystemState.OFF;
 
     private final double CONVEYOR_POWER = 1;
     private final double INTAKE_POWER = 0.5;
-    private final double LIFT_POWER = 0.4;
-    private final double JEWEL_UP = 1;
-    private final double JEWEL_DOWN = 0.49;
+    private final double LIFT_POWER = 0.7;
+    private final double LIFT_RATIO = 0.95;     //right over left
+    private final double JEWEL_UP = 0.8;
+    private final double JEWEL_DOWN = 0.5;
+    private final double DRIVE_SCALE = 0.9;
 
-    public RobotHardwareMec(HardwareMap hwMap){
+    public RobotHardwareMec(HardwareMap hwMap) {
         map = hwMap;
     }
 
-    public void init(){
+    public void init() {
         fL = map.get(DcMotor.class, "frontLeft");
         fR = map.get(DcMotor.class, "frontRight");
         bL = map.get(DcMotor.class, "backLeft");
@@ -54,7 +58,8 @@ public class RobotHardwareMec {
         conveyorLeft = map.get(DcMotor.class, "conveyorLeft");
         conveyorRight = map.get(DcMotor.class, "conveyorRight");
 
-        //lift = map.get(DcMotor.class, "lift");
+        liftLeft = map.get(DcMotor.class, "liftLeft");
+        liftRight = map.get(DcMotor.class, "liftRight");
 
         jewel = map.get(Servo.class, "jewel");
 
@@ -62,13 +67,6 @@ public class RobotHardwareMec {
         bR.setDirection(DcMotorSimple.Direction.FORWARD);
         fL.setDirection(DcMotorSimple.Direction.REVERSE);
         bL.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        /*
-        fR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        */
 
         fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -81,56 +79,65 @@ public class RobotHardwareMec {
         conveyorLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         conveyorRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        //lift.setDirection(DcMotorSimple.Direction.FORWARD);
+        conveyorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        conveyorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftRight.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
-    public double[] drive(Gamepad gp){
-        double leftY =  gp.left_stick_y;
-        double leftX =  gp.left_stick_x;
+    public double[] drive(Gamepad gp) {
+        double leftY = -gp.left_stick_y;
+        double leftX = gp.left_stick_x;
         double rightX = gp.right_stick_x;
         leftY = Math.abs(leftY) > 0.03 ? leftY : 0;
         leftX = Math.abs(leftX) > 0.03 ? leftX : 0;
         rightX = Math.abs(rightX) > 0.03 ? rightX : 0;
-        double a = 0.7;
+        double a = 2.0 / 3;
 
-        return drive(scale(leftY,a), scale(leftX,a), scale(rightX,a));
+        return drive(scale(leftY, a), scale(leftX, a), scale(rightX, a));
     }
 
-    public double scale(double x, double a){
-        return x*((a*x*x) - a + 1);
+    private double scale(double x, double a) {
+        return x * ((a * x * x) - a + 1);
     }
 
-    public double[] drive(double forward, double strafe, double turn){
-        forward = Range.clip(forward, -1, 1);
-        strafe = Range.clip(strafe, -1, 1);
-        turn = Range.clip(turn, -1, 1);
+    public double[] drive(double forward, double strafe, double turn) {
+        double f = -Range.clip(forward, -1, 1);
+        double s = Range.clip(strafe, -1, 1);
+        double t = Range.clip(turn, -1, 1);
 
-        double v = Math.hypot(strafe, forward);
-        double theta = Math.atan2(forward, strafe) - Math.PI/4;
-        final double v1 = (v * Math.cos(theta)) + turn;
-        final double v2 = (v * Math.cos(theta)) - turn;
-        final double v3 = (v * Math.sin(theta)) + turn;
-        final double v4 = (v * Math.sin(theta)) - turn;
+        double hyp = Math.hypot(f, s);
+        double theta = Math.atan2(f, s) - Math.PI / 4;
+        double v[] = new double[4];
 
-        double vmax = Math.max(Math.max(Math.abs(v1), Math.abs(v2)), Math.max(Math.abs(v3), Math.abs(v4)));
-        if(vmax == 0){
-            fL.setPower(0);
-            fR.setPower(0);
-            bL.setPower(0);
-            bR.setPower(0);
-            vmax = 1;
-        } else {
-            fR.setPower(v1 * Math.abs(v1 / vmax) * 0.8);
-            fL.setPower(v2 * Math.abs(v2 / vmax) * 0.8);
-            bR.setPower(v3 * Math.abs(v3 / vmax) * 0.8);
-            bL.setPower(v4 * Math.abs(v4 / vmax) * 0.8);
+        v[0] = (hyp * Math.cos(theta)) + t;
+        v[1] = (hyp * Math.cos(theta)) - t;
+        v[2] = (hyp * Math.sin(theta)) + t;
+        v[3] = (hyp * Math.sin(theta)) - t;
 
+        v = normalize(v);
+
+        fR.setPower(v[0] * DRIVE_SCALE);
+        fL.setPower(v[1] * DRIVE_SCALE);
+        bR.setPower(v[2] * DRIVE_SCALE);
+        bL.setPower(v[3] * DRIVE_SCALE);
+
+        return new double[]{f, s, hyp, theta * 180 / Math.PI, v[0], v[1], v[2], v[3]};
+    }
+
+    private double[] normalize(double[] values) {
+        double max = Math.abs(values[0]);
+        for (double val : values) if (Math.abs(val) > max) max = Math.abs(val);
+        if(max >= 1) {
+            for (int i = 0; i < values.length; i++) {
+                values[i] = values[i] / max;
+            }
         }
-
-        return new double[] {-forward, -strafe, v, theta*180/Math.PI, v1 * Math.abs(v1/vmax), v2 * Math.abs(v2/vmax), v3 * Math.abs(v3/vmax), Math.abs(v4 * v4/vmax)};
+        return values;
     }
 
-    public void stop(){
+    public void stop() {
         fL.setPower(0);
         fR.setPower(0);
         bL.setPower(0);
@@ -138,21 +145,20 @@ public class RobotHardwareMec {
     }
 
     public SystemState[] getIntakeState() {
-        return new SystemState[] { intakeLeftState, intakeRightState };
+        return new SystemState[]{intakeLeftState, intakeRightState};
     }
 
     public SystemState[] getConveyorState() {
-        return new SystemState[] { conveyorLeftState, conveyorLeftState };
+        return new SystemState[]{conveyorLeftState, conveyorRightState};
     }
-    /*
-    public SystemState getLiftState() {
-        return liftState;
-    }
-    */
 
-    public void setConveyorLeft(SystemState st){
+    public SystemState[] getLiftState() {
+        return new SystemState[] {liftLeftState, liftRightState};
+    }
+
+    public void setConveyorLeft(SystemState st) {
         conveyorLeftState = st;
-        switch(st){
+        switch (st) {
             case OFF:
                 conveyorLeft.setPower(0);
                 break;
@@ -165,9 +171,9 @@ public class RobotHardwareMec {
         }
     }
 
-    public void setConveyorRight(SystemState st){
+    public void setConveyorRight(SystemState st) {
         conveyorRightState = st;
-        switch(st){
+        switch (st) {
             case OFF:
                 conveyorRight.setPower(0);
                 break;
@@ -180,9 +186,9 @@ public class RobotHardwareMec {
         }
     }
 
-    public void setIntakeLeft(SystemState st){
+    public void setIntakeLeft(SystemState st) {
         intakeLeftState = st;
-        switch(st){
+        switch (st) {
             case OFF:
                 intakeLeft.setPower(0);
                 break;
@@ -195,9 +201,9 @@ public class RobotHardwareMec {
         }
     }
 
-    public void setIntakeRight(SystemState st){
+    public void setIntakeRight(SystemState st) {
         intakeRightState = st;
-        switch(st){
+        switch (st) {
             case OFF:
                 intakeRight.setPower(0);
                 break;
@@ -210,28 +216,41 @@ public class RobotHardwareMec {
         }
     }
 
-    /*
-    public void setLift(SystemState st){
-        liftState = st;
-        switch(st){
+    public void setLiftLeft(SystemState st) {
+        liftLeftState = st;
+        switch (st) {
             case OFF:
-                lift.setPower(0);
+                liftLeft.setPower(0);
                 break;
             case FORWARD:
-                lift.setPower(LIFT_POWER);
+                liftLeft.setPower(LIFT_POWER);
                 break;
             case BACKWARD:
-                lift.setPower(-LIFT_POWER);
+                liftLeft.setPower(-LIFT_POWER);
                 break;
         }
     }
-    */
 
-    public void jewelDown(){
+    public void setLiftRight(SystemState st) {
+        liftRightState = st;
+        switch (st) {
+            case OFF:
+                liftRight.setPower(0);
+                break;
+            case FORWARD:
+                liftRight.setPower(LIFT_POWER);
+                break;
+            case BACKWARD:
+                liftRight.setPower(-LIFT_POWER);
+                break;
+        }
+    }
+
+    public void jewelDown() {
         jewel.setPosition(JEWEL_DOWN);
     }
 
-    public void jewelUp(){
+    public void jewelUp() {
         jewel.setPosition(JEWEL_UP);
     }
 

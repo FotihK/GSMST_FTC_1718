@@ -2,11 +2,8 @@ package org.firstinspires.ftc.team2981;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.team2981.structural.RobotHardware;
 import org.firstinspires.ftc.team2981.structural.RobotHardwareMec;
 import org.firstinspires.ftc.team2981.structural.Sensors;
 import org.firstinspires.ftc.team2981.structural.Vision;
@@ -21,14 +18,8 @@ public class Auto extends LinearOpMode {
     private Sensors sensors;
     private Vision vision;
 
-    static final double DRIVE_SPEED = 0.7;
-    static final double TURN_SPEED = 0.5;
-    static final double HEADING_THRESH = 1;
-    static final double P_TURN_COEFF = 0.1;
-    static final double P_DRIVE_COEFF = 0.15;
-    private boolean blueTeam;
+    private boolean blue;
     private ElapsedTime meaner = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    private ElapsedTime runtime = new ElapsedTime();
 
 
     public void initialize() {
@@ -55,18 +46,18 @@ public class Auto extends LinearOpMode {
             while (!isStarted()) {
                 if (gamepad1.dpad_up) {
                     vision.switchLocation(1);
-                    blueTeam = true;
+                    blue = true;
                 } else if (gamepad1.dpad_down) {
                     vision.switchLocation(2);
-                    blueTeam = true;
+                    blue = true;
                 } else if (gamepad1.dpad_left) {
                     vision.switchLocation(3);
-                    blueTeam = false;
+                    blue = false;
                 } else if (gamepad1.dpad_right) {
                     vision.switchLocation(4);
-                    blueTeam = false;
+                    blue = false;
                 }
-                telemetry.addData("Team ", blueTeam ? "Blue" : "Red");
+                telemetry.addData("Team ", blue ? "Blue" : "Red");
                 telemetry.addData("Location: ", vision.getLoc());
                 telemetry.update();
             }
@@ -106,6 +97,7 @@ public class Auto extends LinearOpMode {
                 telemetry.update();
             }
             */
+            vision.stop();
         }
     });
 
@@ -117,26 +109,25 @@ public class Auto extends LinearOpMode {
         robot.jewelDown();
         meaner.reset();
         int blue = 0, red = 0, count = 0;
-        while (meaner.milliseconds() < 3000) {
+        while (meaner.milliseconds() < 2000) {
             blue += sensors.getRGB()[2];
             red += sensors.getRGB()[0];
             count++;
-            telemetry.addData("B/R/C: ", "(%d, %d, %d)", blue, red, count);
-            telemetry.update();
-            sleep(100);
+            sleep(50);
         }
         blue /= count;
         red /= count;
 
         telemetry.addData("B/R/C: ", "%d/%d/%d", blue, red, count);
         telemetry.update();
-        sleep(5000);
-        if (blueTeam) {
-            if (red < blue) robot.drive(-0.45, 0, 0);
+        sleep(2000);
+
+        if(red > blue){
+            if(this.blue) robot.drive(-0.45, 0, 0);
             else robot.drive(0.45, 0, 0);
         } else {
-            if (blue < red) robot.drive(-0.45, 0, 0);
-            else robot.drive(0.45, 0, 0);
+            if(this.blue) robot.drive(0.45, 0, 0);
+            else robot.drive(-0.45, 0, 0);
         }
 
         sleep(1000);
@@ -144,21 +135,26 @@ public class Auto extends LinearOpMode {
         robot.jewelUp();
         sleep(2000);
 
+        if(this.blue){
+            robot.drive(-0.45, 0, 0);
+        } else {
+            robot.drive(0.45, 0, 0);
+        }
+        sleep(1500);
+        robot.stop();
+        sleep(1000);
+
         switch(vision.getLoc()){
             case 1:
-                robot.drive(-0.45, 0, 0);
+            case 3:
+                robot.drive(0, -0.45, 0);
                 break;
             case 2:
-                robot.drive(-0.45, 0, 0);
-                break;
-            case 3:
-                robot.drive(0.45, 0, 0);
-                break;
             case 4:
-                robot.drive(0.45, 0, 0);
-                break;
+                robot.drive(0, 0.45, 0);
         }
-        sleep(1750);
+        sleep(750);
         robot.stop();
+
     }
 }

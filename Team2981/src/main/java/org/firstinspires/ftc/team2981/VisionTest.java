@@ -10,7 +10,7 @@ import org.firstinspires.ftc.team2981.structural.Vision;
  * Created by 200462069 on 11/10/2017.
  */
 
-@Autonomous(name="VisionTest")
+@Autonomous(name = "VisionTest")
 public class VisionTest extends LinearOpMode {
 
     private Vision vision;
@@ -85,7 +85,7 @@ public class VisionTest extends LinearOpMode {
         vision = new Vision(hardwareMap);
         visionThread.start();
         waitForStart();
-        while(!isStopRequested()){
+        while (!isStopRequested()) {
             sleep(10);
         }
     }

@@ -34,7 +34,7 @@ public class Vision {
     private final float mmFtcFieldWidth = ((12 * 12) - 2) * mmPerInch;
     private int loc;
 
-    public Vision(HardwareMap hardwareMap){
+    public Vision(HardwareMap hardwareMap) {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
@@ -49,35 +49,35 @@ public class Vision {
         relic = trackables.get(0);
         relic.setName("relicVuMarkTemplate");
 
-        phone = OpenGLMatrix.translation(5.75f*mmPerInch,-6.625f*mmPerInch, 5.25f*mmPerInch).multiplied(OpenGLMatrix.rotation(
-                AxesReference.EXTRINSIC,AxesOrder.XZX,AngleUnit.DEGREES, 90,0,0));
-
-        blueBox = OpenGLMatrix.translation(15.25f*mmPerInch,mmFtcFieldWidth/2, 5.75f).multiplied(OpenGLMatrix.rotation(
-                AxesReference.EXTRINSIC, AxesOrder.XZX, AngleUnit.DEGREES, 90, 0, 0));
-        blueRelic = OpenGLMatrix.translation(-55.625f*mmPerInch,mmFtcFieldWidth/2, 5.75f).multiplied(OpenGLMatrix.rotation(
+        phone = OpenGLMatrix.translation(5.75f * mmPerInch, -6.625f * mmPerInch, 5.25f * mmPerInch).multiplied(OpenGLMatrix.rotation(
                 AxesReference.EXTRINSIC, AxesOrder.XZX, AngleUnit.DEGREES, 90, 0, 0));
 
-        redBox = OpenGLMatrix.translation(32.25f*mmPerInch,-mmFtcFieldWidth/2, 5.75f).multiplied(OpenGLMatrix.rotation(
+        blueBox = OpenGLMatrix.translation(15.25f * mmPerInch, mmFtcFieldWidth / 2, 5.75f).multiplied(OpenGLMatrix.rotation(
+                AxesReference.EXTRINSIC, AxesOrder.XZX, AngleUnit.DEGREES, 90, 0, 0));
+        blueRelic = OpenGLMatrix.translation(-55.625f * mmPerInch, mmFtcFieldWidth / 2, 5.75f).multiplied(OpenGLMatrix.rotation(
+                AxesReference.EXTRINSIC, AxesOrder.XZX, AngleUnit.DEGREES, 90, 0, 0));
+
+        redBox = OpenGLMatrix.translation(32.25f * mmPerInch, -mmFtcFieldWidth / 2, 5.75f).multiplied(OpenGLMatrix.rotation(
                 AxesReference.EXTRINSIC, AxesOrder.XZX, AngleUnit.DEGREES, 90, 180, 0));
-        redRelic = OpenGLMatrix.translation(-38.625f*mmPerInch,-mmFtcFieldWidth/2, 5.75f).multiplied(OpenGLMatrix.rotation(
+        redRelic = OpenGLMatrix.translation(-38.625f * mmPerInch, -mmFtcFieldWidth / 2, 5.75f).multiplied(OpenGLMatrix.rotation(
                 AxesReference.EXTRINSIC, AxesOrder.XZX, AngleUnit.DEGREES, 90, 180, 0));
 
-        ((VuforiaTrackableDefaultListener)relic.getListener()).setPhoneInformation(phone, parameters.cameraDirection);
+        ((VuforiaTrackableDefaultListener) relic.getListener()).setPhoneInformation(phone, parameters.cameraDirection);
 
     }
 
-    public void start(int loc){
+    public void start(int loc) {
         trackables.activate();
         switchLocation(loc);
     }
 
-    public void stop(){
+    public void stop() {
         trackables.deactivate();
     }
 
-    public void switchLocation(int loc){
+    public void switchLocation(int loc) {
         this.loc = loc;
-        switch(loc){
+        switch (loc) {
             case 1:
                 relic.setLocation(blueBox);
                 break;
@@ -93,33 +93,33 @@ public class Vision {
         }
     }
 
-    public int getLoc(){
+    public int getLoc() {
         return loc;
     }
 
-    public RelicRecoveryVuMark trackMark(){
-        pose = ((VuforiaTrackableDefaultListener)relic.getListener()).getPose();
+    public RelicRecoveryVuMark trackMark() {
+        pose = ((VuforiaTrackableDefaultListener) relic.getListener()).getPose();
         return RelicRecoveryVuMark.from(relic);
     }
 
-    public OpenGLMatrix trackLocation(){
-        OpenGLMatrix robotLocTrans = ((VuforiaTrackableDefaultListener)relic.getListener()).getUpdatedRobotLocation();
-        if(robotLocTrans != null) last = robotLocTrans;
-        if(last != null) return last;
+    public OpenGLMatrix trackLocation() {
+        OpenGLMatrix robotLocTrans = ((VuforiaTrackableDefaultListener) relic.getListener()).getUpdatedRobotLocation();
+        if (robotLocTrans != null) last = robotLocTrans;
+        if (last != null) return last;
         else return null;
     }
 
-    public float[] getTrans(){
-        if(pose != null){
+    public float[] getTrans() {
+        if (pose != null) {
             VectorF trans = pose.getTranslation();
-            return new float[] {trans.get(0), trans.get(1), trans.get(2)};
+            return new float[]{trans.get(0), trans.get(1), trans.get(2)};
         } else return null;
     }
 
-    public float[] getRot(){
-        if(pose != null){
+    public float[] getRot() {
+        if (pose != null) {
             Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-            return new float[] {rot.firstAngle, rot.secondAngle, rot.thirdAngle};
+            return new float[]{rot.firstAngle, rot.secondAngle, rot.thirdAngle};
         } else return null;
     }
 }

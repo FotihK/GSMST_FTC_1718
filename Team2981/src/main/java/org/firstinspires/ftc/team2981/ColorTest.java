@@ -9,10 +9,11 @@ import org.firstinspires.ftc.team2981.structural.Sensors;
 /**
  * Created by 200462069 on 11/11/2017.
  */
-@TeleOp(name="ColorTest")
+@TeleOp(name = "ColorTest")
 public class ColorTest extends OpMode {
 
     Sensors sensors = null;
+
     @Override
     public void init() {
         sensors = new Sensors(hardwareMap);

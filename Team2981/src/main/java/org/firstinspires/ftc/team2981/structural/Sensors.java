@@ -15,35 +15,35 @@ public class Sensors {
     private ModernRoboticsI2cColorSensor color = null;
     private HardwareMap map = null;
 
-    public Sensors(HardwareMap map){
+    public Sensors(HardwareMap map) {
         this.map = map;
     }
 
-    public void init(){
+    public void init() {
         //gyro = (BNO055IMU) map.gyroSensor.get("gyro");
         color = (ModernRoboticsI2cColorSensor) map.colorSensor.get("color");
     }
 
-    public void calibrate(){
+    public void calibrate() {
         //gyro.calibrate();
     }
 
-    public boolean isGyroCalibrating(){
+    public boolean isGyroCalibrating() {
         //return gyro.isCalibrating();
         return false;
     }
 
-    public void resetGyro(){
+    public void resetGyro() {
         //gyro.resetZAxisIntegrator();
     }
 
     //public int getGyroHeading(){
-        //return gyro.getIntegratedZValue();
+    //return gyro.getIntegratedZValue();
 
     //}
 
-    public int[] getRGB(){
-        return new int[] {color.red(), color.green(), color.blue()};
+    public int[] getRGB() {
+        return new int[]{color.red(), color.green(), color.blue()};
     }
 
 
