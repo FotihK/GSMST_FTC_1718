@@ -18,11 +18,11 @@ public class RobotHardware
 
     public final double INTAKE_SPEED = .25d;
 
-    public final double CLAW_OPEN_POSITION    = .9d;
-    public final double CLAW_CLOSED_POSITION  = 1d;
+    public final double CLAW_OPEN_POSITION    = 0d;
+    public final double CLAW_CLOSED_POSITION  = .1d;
 
-    public final double SIDEARM_UP_POSITION   = .5d;
-    public final double SIDEARM_DOWN_POSITION = 1d;
+    public final double SIDEARM_UP_POSITION   = 0d;
+    public final double SIDEARM_DOWN_POSITION = .5d;
 
 
 
@@ -61,9 +61,9 @@ public class RobotHardware
         fR.setDirection(DcMotorSimple.Direction.REVERSE);
         bL.setDirection(DcMotorSimple.Direction.FORWARD);
         bR.setDirection(DcMotorSimple.Direction.REVERSE);
-        arm.setDirection(DcMotorSimple.Direction.FORWARD);
+        arm.setDirection(DcMotorSimple.Direction.REVERSE);
         liftL.setDirection(DcMotorSimple.Direction.FORWARD);
-        liftR.setDirection(DcMotorSimple.Direction.FORWARD);
+        liftR.setDirection(DcMotorSimple.Direction.REVERSE);
 
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -138,10 +138,10 @@ public class RobotHardware
     public void SetClaw(double position)
     {
         clawL.setPosition(position);
-        clawR.setPosition(position);
+        clawR.setPosition(-position);
     }
 
-    public void SetInake(boolean intakeOn)
+    public void SetIntake(boolean intakeOn)
     {
         if (intakeOn)
         {
