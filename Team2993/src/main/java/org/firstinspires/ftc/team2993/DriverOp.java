@@ -160,14 +160,14 @@ public class DriverOp extends OpMode
 
 
 
-        if (gamepad2.left_bumper && !intakeButtonHeld)                                              // Toggle intake
-        {
-            intakeOn = !intakeOn;
-            Robot.SetIntake(intakeOn);
-            intakeButtonHeld = true;
-        }
-        else if (!gamepad2.left_bumper)
-            intakeButtonHeld = false;
+        if      (gamepad2.dpad_left)
+                Robot.SetIntake(1);
+        else if (gamepad2.dpad_down)
+            Robot.SetIntake(0);
+        else if (gamepad2.dpad_right)
+            Robot.SetIntake(-1);
+
+
 
         if (gamepad2.dpad_up)
             Robot.sideArm.setPosition(0d);

@@ -27,6 +27,25 @@ public class AutonomousBlue extends LinearOpMode
 
         waitForStart();
 
+        int colorValue = color.GetTeamColor();
 
+        if (colorValue > 0)
+            robot.SetMotors(.25 * team);
+        else
+            robot.SetMotors(-.25 * team);
+        wait(500);
+
+        robot.Clear();
+        robot.sideArm.setPosition(0);
+        wait(1000);
+
+        robot.Clear();
+    }
+
+    public void wait (int ms)
+    {
+        timer.reset();
+        while (timer.time() < ms)
+            idle();
     }
 }

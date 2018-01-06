@@ -18,8 +18,8 @@ public class RobotHardware
 
     public final double INTAKE_SPEED = .25d;
 
-    public final double CLAW_OPEN_POSITION    = 0d;
-    public final double CLAW_CLOSED_POSITION  = .1d;
+    public final double CLAW_OPEN_POSITION    = .8d;
+    public final double CLAW_CLOSED_POSITION  = 1d;
 
     public final double SIDEARM_UP_POSITION   = 0d;
     public final double SIDEARM_DOWN_POSITION = .5d;
@@ -82,7 +82,7 @@ public class RobotHardware
         sideArm = Map.get(Servo.class, "sidearm");
 
         clawL.scaleRange(CLAW_OPEN_POSITION, CLAW_CLOSED_POSITION);
-        clawR.scaleRange(CLAW_OPEN_POSITION, CLAW_CLOSED_POSITION);
+        clawR.scaleRange(1 - CLAW_CLOSED_POSITION, 1 - CLAW_OPEN_POSITION);
         sideArm.scaleRange(SIDEARM_UP_POSITION, SIDEARM_DOWN_POSITION);
         sideArm.setPosition(0);
     }
@@ -112,6 +112,11 @@ public class RobotHardware
         bR.setPower(br);
     }
 
+    public void Clear()
+    {
+        SetMotors(0d);
+    }
+
     public void SetArm(double speed)
     {
         speed = Range.clip(speed, -1d, 1d);
@@ -138,20 +143,12 @@ public class RobotHardware
     public void SetClaw(double position)
     {
         clawL.setPosition(position);
-        clawR.setPosition(-position);
+        clawR.setPosition(1 - position);
     }
 
-    public void SetIntake(boolean intakeOn)
+    public void SetIntake(int speed)
     {
-        if (intakeOn)
-        {
-            intakeL.setPower(INTAKE_SPEED);
-            intakeR.setPower(INTAKE_SPEED);
-        }
-        else
-        {
-            intakeL.setPower(0d);
-            intakeR.setPower(0d);
-        }
+        intakeL.setPower(INTAKE_SPEED * speed);
+        intakeR.setPower(INTAKE_SPEED * speed);
     }
 }
