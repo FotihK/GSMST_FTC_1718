@@ -15,9 +15,10 @@ public class DriverOp extends OpMode
     //
 
     public final double JOYSTICK_THRESHOLD = .1d;
-    public final double MOTOR_SPEED        = .5d;
+    public final double MOTOR_SPEED        = 1d;
 
-    public final double LIFT_SPEED_UP      = .75d;
+    public final double LIFT_SPEED_UP      = 1d;
+
     public final double LIFT_SPEED_DOWN    = .5d;
 
     public final double ARM_SPEED_UP       = .2d;
@@ -100,13 +101,13 @@ public class DriverOp extends OpMode
                     Robot.SetMotors(-MOTOR_SPEED, MOTOR_SPEED, MOTOR_SPEED, -MOTOR_SPEED);
                     break;
                 case 5:
-                    Robot.SetMotors(0d, -MOTOR_SPEED, -MOTOR_SPEED, 0d);
+                    Robot.SetMotors(-MOTOR_SPEED, 0d, 0d, -MOTOR_SPEED);
                     break;
                 case 6:
                     Robot.SetMotors(-MOTOR_SPEED);
                     break;
                 case 7:
-                    Robot.SetMotors(-MOTOR_SPEED, 0d, 0d, -MOTOR_SPEED);
+                    Robot.SetMotors(0d, -MOTOR_SPEED, -MOTOR_SPEED, 0d);
                     break;
             }
         }
@@ -114,6 +115,15 @@ public class DriverOp extends OpMode
             Robot.SetMotors(MOTOR_SPEED  * rightX, -MOTOR_SPEED * rightX);
         else
             Robot.SetMotors(0d);
+
+
+
+        if      (gamepad1.dpad_left)
+            Robot.SetIntake(1);
+        else if (gamepad1.dpad_down)
+            Robot.SetIntake(0);
+        else if (gamepad1.dpad_right)
+            Robot.SetIntake(-1);
     }
 
     public void DriverTwo()
@@ -157,15 +167,6 @@ public class DriverOp extends OpMode
         }
         else if (!(gamepad2.right_bumper || gamepad2.y))
             clawButtonHeld = false;
-
-
-
-        if      (gamepad2.dpad_left)
-                Robot.SetIntake(1);
-        else if (gamepad2.dpad_down)
-            Robot.SetIntake(0);
-        else if (gamepad2.dpad_right)
-            Robot.SetIntake(-1);
 
 
 

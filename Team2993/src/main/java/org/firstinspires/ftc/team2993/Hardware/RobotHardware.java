@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 
 
 public class RobotHardware
+
 {
     //
     // Configuration variables
@@ -18,8 +19,13 @@ public class RobotHardware
 
     public final double INTAKE_SPEED = .25d;
 
-    public final double CLAW_OPEN_POSITION    = .8d;
-    public final double CLAW_CLOSED_POSITION  = 1d;
+    public final double CLAW_OPEN_POSITION_LEFT    = .7d;
+    public final double CLAW_CLOSED_POSITION_LEFT  = .9d;
+
+
+    public final double CLAW_OPEN_POSITION_RIGHT    = .2d;
+    public final double CLAW_CLOSED_POSITION_RIGHT  = .4d;
+
 
     public final double SIDEARM_UP_POSITION   = 0d;
     public final double SIDEARM_DOWN_POSITION = .5d;
@@ -62,8 +68,8 @@ public class RobotHardware
         bL.setDirection(DcMotorSimple.Direction.FORWARD);
         bR.setDirection(DcMotorSimple.Direction.REVERSE);
         arm.setDirection(DcMotorSimple.Direction.REVERSE);
-        liftL.setDirection(DcMotorSimple.Direction.FORWARD);
-        liftR.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftL.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -81,10 +87,13 @@ public class RobotHardware
         clawR   = Map.get(Servo.class, "clawr");
         sideArm = Map.get(Servo.class, "sidearm");
 
-        clawL.scaleRange(CLAW_OPEN_POSITION, CLAW_CLOSED_POSITION);
-        clawR.scaleRange(1 - CLAW_CLOSED_POSITION, 1 - CLAW_OPEN_POSITION);
+        clawL.scaleRange(CLAW_OPEN_POSITION_LEFT, CLAW_CLOSED_POSITION_LEFT);
+        clawR.scaleRange(CLAW_OPEN_POSITION_RIGHT, CLAW_CLOSED_POSITION_RIGHT);
+
         sideArm.scaleRange(SIDEARM_UP_POSITION, SIDEARM_DOWN_POSITION);
         sideArm.setPosition(0);
+
+        intakeL.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
 
@@ -143,7 +152,7 @@ public class RobotHardware
     public void SetClaw(double position)
     {
         clawL.setPosition(position);
-        clawR.setPosition(1 - position);
+        clawR.setPosition((position + 1) % 2);
     }
 
     public void SetIntake(int speed)

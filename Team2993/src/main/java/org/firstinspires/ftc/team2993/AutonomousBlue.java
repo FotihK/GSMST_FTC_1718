@@ -17,6 +17,8 @@ public class AutonomousBlue extends LinearOpMode
     ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int team = 1;
 
+    int addedTime = 0;
+
     @Override
     public void runOpMode()
     {
@@ -27,18 +29,27 @@ public class AutonomousBlue extends LinearOpMode
 
         waitForStart();
 
+        wait(2000);
+        robot.sideArm.setPosition(1);
+        wait(2000);
+
         int colorValue = color.GetTeamColor();
 
-        if (colorValue > 0)
+        if (colorValue < 0)
             robot.SetMotors(.25 * team);
         else
+        {
             robot.SetMotors(-.25 * team);
+            addedTime = 500;
+        }
         wait(500);
 
         robot.Clear();
         robot.sideArm.setPosition(0);
         wait(1000);
 
+        robot.SetMotors(1);
+        wait(1500 + addedTime);
         robot.Clear();
     }
 
