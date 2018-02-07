@@ -35,12 +35,12 @@ public class RobotHardwareMec {
     private SystemState liftRightState = SystemState.OFF;
 
     private final double CONVEYOR_POWER = 1;
-    private final double INTAKE_POWER = 0.5;
+    private final double INTAKE_POWER = 0.55;
     private final double LIFT_POWER = 0.7;
-    private final double LIFT_RATIO = 0.95;     //right over left
-    private final double JEWEL_UP = 0.8;
-    private final double JEWEL_DOWN = 0.5;
-    private final double DRIVE_SCALE = 0.9;
+    private final double LIFT_RATIO = 0.945;     //right over left
+    private final double JEWEL_UP = 0.025;
+    private final double JEWEL_DOWN = 0.505;
+    private final double DRIVE_SCALE = 1;
 
     public RobotHardwareMec(HardwareMap hwMap) {
         map = hwMap;
@@ -93,7 +93,7 @@ public class RobotHardwareMec {
         leftY = Math.abs(leftY) > 0.03 ? leftY : 0;
         leftX = Math.abs(leftX) > 0.03 ? leftX : 0;
         rightX = Math.abs(rightX) > 0.03 ? rightX : 0;
-        double a = 2.0 / 3;
+        double a = 5.0 / 8;
 
         return drive(scale(leftY, a), scale(leftX, a), scale(rightX, a));
     }
@@ -223,10 +223,10 @@ public class RobotHardwareMec {
                 liftLeft.setPower(0);
                 break;
             case FORWARD:
-                liftLeft.setPower(LIFT_POWER);
+                liftLeft.setPower(LIFT_POWER * LIFT_RATIO);
                 break;
             case BACKWARD:
-                liftLeft.setPower(-LIFT_POWER);
+                liftLeft.setPower(-LIFT_POWER * LIFT_RATIO);
                 break;
         }
     }

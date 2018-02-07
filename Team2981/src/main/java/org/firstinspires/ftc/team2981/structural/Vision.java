@@ -41,7 +41,7 @@ public class Vision {
         //parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = "AaDxUz3/////AAAAGSJYyeGWDU3Im6rx85GbYy5gq8Raja7mkDAmDCUs6BvNAusEF4omrCaZUFeEG7gyW/Sq1exxlBmowJ4IY2ICrleyyxb1XJaFw0IsYhuBzESI/duL9SW2gVXcULoqBd7q4wniSHWZNNlkMYiuSbaW6z7299VJzV0QEi0HugnY+5PhZHUts9CU+lGIukrkAIDWP5bXOEmERBRpl4XKWIviWeCGHiVQVwAjeBEPnX1fsqRf+178gAoXEXDanp9cHriUGyU4a0vqhvJyb2LoQG5NrNLoFGUMU45pTWdjjY8TuVv9sfYSVwcboP2vzFeh8TVBbQRJrNrdWiRbw35nn+JSrZY6ulR5ZSDTq7l1apzxTy/s\n";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
 
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
@@ -95,6 +95,21 @@ public class Vision {
 
     public int getLoc() {
         return loc;
+    }
+
+    public String getLocName(){
+        switch (loc) {
+            case 1:
+                return "Blue Box";
+            case 2:
+                return "Blue Relic";
+            case 3:
+                return "Red Box";
+            case 4:
+                return "Red Relic";
+            default:
+                return "No Location";
+        }
     }
 
     public RelicRecoveryVuMark trackMark() {

@@ -64,13 +64,17 @@ public class DriverOp extends OpMode {
                 robot.setConveyorLeft(BACKWARD);
             } else if (gamepad2.left_trigger > 0.05) {
                 robot.setConveyorLeft(FORWARD);
-            } else robot.setConveyorLeft(OFF);
+            } else {
+                robot.setConveyorLeft(OFF);
+            }
 
             if (gamepad2.right_bumper) {
                 robot.setConveyorRight(BACKWARD);
             } else if (gamepad2.right_trigger > 0.05) {
                 robot.setConveyorRight(FORWARD);
-            } else robot.setConveyorRight(OFF);
+            } else {
+                robot.setConveyorRight(OFF);
+            }
         }
 
         if (gamepad2.dpad_up) {

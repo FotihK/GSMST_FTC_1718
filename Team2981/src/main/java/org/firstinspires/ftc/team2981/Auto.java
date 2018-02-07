@@ -8,6 +8,9 @@ import org.firstinspires.ftc.team2981.structural.RobotHardwareMec;
 import org.firstinspires.ftc.team2981.structural.Sensors;
 import org.firstinspires.ftc.team2981.structural.Vision;
 
+import static org.firstinspires.ftc.team2981.structural.RobotHardwareMec.SystemState.*;
+
+
 /**
  * Created by 200462069 on 10/18/2017.
  */
@@ -33,9 +36,6 @@ public class Auto extends LinearOpMode {
         robot.jewelUp();
 
         waitForStart();
-
-        telemetry.clearAll();
-        telemetry.update();
     }
 
     private Thread visionThread = new Thread(new Runnable() {
@@ -43,7 +43,7 @@ public class Auto extends LinearOpMode {
         public void run() {
             vision.start(1);
 
-            while (!isStarted()) {
+            while (!isStarted() && !isStopRequested()) {
                 if (gamepad1.dpad_up) {
                     vision.switchLocation(1);
                     blue = true;
@@ -58,7 +58,7 @@ public class Auto extends LinearOpMode {
                     blue = false;
                 }
                 telemetry.addData("Team ", blue ? "Blue" : "Red");
-                telemetry.addData("Location: ", vision.getLoc());
+                telemetry.addData("Location: ", vision.getLoc() + " : " + vision.getLocName());
                 telemetry.update();
             }
 /*
@@ -105,11 +105,11 @@ public class Auto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
-        sleep(5000);
+        sleep(1500);
         robot.jewelDown();
         meaner.reset();
         int blue = 0, red = 0, count = 0;
-        while (meaner.milliseconds() < 2000) {
+        while (meaner.milliseconds() < 2000 && opModeIsActive()) {
             blue += sensors.getRGB()[2];
             red += sensors.getRGB()[0];
             count++;
@@ -120,7 +120,7 @@ public class Auto extends LinearOpMode {
 
         telemetry.addData("B/R/C: ", "%d/%d/%d", blue, red, count);
         telemetry.update();
-        sleep(2000);
+        sleep(1000);
 
         if(red > blue){
             if(this.blue) robot.drive(-0.45, 0, 0);
@@ -130,31 +130,120 @@ public class Auto extends LinearOpMode {
             else robot.drive(-0.45, 0, 0);
         }
 
-        sleep(1000);
+        sleep(350);
         robot.stop();
         robot.jewelUp();
-        sleep(2000);
+        sleep(1000);
+
+        if(red > blue){
+            if(this.blue) robot.drive(0.45, 0, 0);
+            else robot.drive(-0.45, 0, 0);
+        } else {
+            if(this.blue) robot.drive(-0.45, 0, 0);
+            else robot.drive(0.45, 0, 0);
+        }
+
+        sleep(550);
+        robot.stop();
+
+        sleep(5000);
 
         if(this.blue){
-            robot.drive(-0.45, 0, 0);
+            robot.drive(-0.67, 0, 0);
         } else {
-            robot.drive(0.45, 0, 0);
+            robot.drive(0.7, 0, 0);
         }
-        sleep(1500);
+        sleep(1400);
         robot.stop();
         sleep(1000);
 
         switch(vision.getLoc()){
             case 1:
             case 3:
-                robot.drive(0, -0.45, 0);
+                robot.drive(0, -0.65, 0);
                 break;
             case 2:
             case 4:
-                robot.drive(0, 0.45, 0);
+                robot.drive(0, 0.4, 0);
         }
-        sleep(750);
+        sleep(1300);
         robot.stop();
+
+        if(vision.getLoc() == 3) {
+
+            robot.setConveyorLeft(FORWARD);
+            robot.setConveyorRight(FORWARD);
+
+            sleep(250);
+
+            robot.setIntakeRight(FORWARD);
+            robot.setIntakeLeft(FORWARD);
+
+            sleep(1750);
+
+            robot.setConveyorLeft(OFF);
+            robot.setConveyorRight(OFF);
+
+            for (int i = 0; i < 3; i++) {
+                if (this.blue) {
+                    robot.drive(0.5, 0, 0);
+                } else {
+                    robot.drive(-0.5, 0, 0);
+                }
+
+                sleep(850);
+                if (this.blue) {
+                    robot.drive(-0.5, 0, 0);
+                } else {
+                    robot.drive(0.5, 0, 0);
+                }
+                sleep(850);
+            }
+
+            robot.stop();
+
+            if (this.blue) {
+                robot.drive(0.5, 0, 0);
+            } else {
+                robot.drive(-0.5, 0, 0);
+            }
+
+            sleep(450);
+            robot.stop();
+        } else if(vision.getLoc() == 1) {
+            robot.setConveyorLeft(BACKWARD);
+            robot.setConveyorRight(BACKWARD);
+
+            sleep(1750);
+
+            for (int i = 0; i < 3; i++) {
+                if (this.blue) {
+                    robot.drive(0.5, 0, 0);
+                } else {
+                    robot.drive(-0.5, 0, 0);
+                }
+
+                sleep(850);
+                if (this.blue) {
+                    robot.drive(-0.525, 0, 0);
+                } else {
+                    robot.drive(0.525, 0, 0);
+                }
+                sleep(850);
+            }
+
+            robot.stop();
+
+            if (this.blue) {
+                robot.drive(0.5, 0, 0);
+            } else {
+                robot.drive(-0.5, 0, 0);
+            }
+
+            sleep(450);
+            robot.stop();
+        }
+
 
     }
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team2981;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.team2981.structural.RobotHardwareMec;
 
@@ -12,51 +13,28 @@ import org.firstinspires.ftc.team2981.structural.RobotHardwareMec;
 @Autonomous(name = "autoTest")
 public class AutoTest extends LinearOpMode {
 
-    private RobotHardwareMec robot;
+    private Servo jewel;
 
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new RobotHardwareMec(hardwareMap);
-        robot.init();
+        jewel = hardwareMap.get(Servo.class, "jewel");
         waitForStart();
-        sleep(2000);
 
-        robot.drive(0.5, 0, 0);
-        sleep(500);
+        for(double ang = 0.25; ang <= 0.75; ang += 0.25){
+            jewel.setPosition(ang);
+            telemetry.addData("Ang: ", ang);
+            telemetry.update();
+            sleep(1000);
+        }
 
-        robot.stop();
-        sleep(750);
+        for(double ang = 0.75; ang >= 0.25; ang -= 0.25){
+            jewel.setPosition(ang);
+            telemetry.addData("Ang: ", ang);
+            telemetry.update();
+            sleep(1000);
+        }
 
-        robot.drive(-0.5, 0, 0);
-        sleep(500);
-
-        robot.stop();
-        sleep(750);
-
-        robot.drive(0, 0.5, 0);
-        sleep(500);
-
-        robot.stop();
-        sleep(750);
-
-        robot.drive(0, -0.5, 0);
-        sleep(500);
-
-        robot.stop();
-        sleep(750);
-
-        robot.drive(0, 0, 0.5);
-        sleep(500);
-
-        robot.stop();
-        sleep(750);
-
-        robot.drive(0, 0, -0.5);
-        sleep(500);
-
-        robot.stop();
-        sleep(750);
 
     }
 }
