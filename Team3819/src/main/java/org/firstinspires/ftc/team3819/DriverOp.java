@@ -12,8 +12,8 @@ import org.firstinspires.ftc.team3819.Structural.RobotHardware;
 @TeleOp(name="TeleOp")
 public class DriverOp extends OpMode {
 
-    RobotHardware robot = null;
-    int ziyan = 1;
+    RobotHardware robot;
+    private int wheelRun = 0;
 
     @Override
     public void init() {
@@ -22,12 +22,11 @@ public class DriverOp extends OpMode {
     }
 
     private void driverOne() {
-        double rightStick = gamepad1.right_stick_y;
-        double leftStick = gamepad1.left_stick_y;
-        leftStick = (Math.abs(leftStick) > 0.05 ? (leftStick) : 0);
-        rightStick = (Math.abs(rightStick) > 0.05 ? (rightStick) : 0);
-        robot.driveLeft(leftStick);
-        robot.driveRight(rightStick);
+        robot.drive(gamepad1);
+
+        if (gamepad1.dpad_up) robot.jewelUp();
+        else if (gamepad1.dpad_down) robot.jewelDown();
+        else if (gamepad1.dpad_left) robot.jewelMid();
     }
 
     private void driverTwo() {
@@ -35,17 +34,27 @@ public class DriverOp extends OpMode {
         double rightStick = gamepad2.right_stick_y;
         leftStick = (Math.abs(leftStick) > 0.1 ? (leftStick) : 0);
         rightStick = (Math.abs(rightStick) > 0.1 ? (rightStick) : 0);
-        robot.rotor(rightStick / 2 * ziyan);
-        robot.lift(leftStick);
-        if (gamepad2.left_bumper) {
-            robot.closeClaw();
-        } else if (gamepad2.right_bumper) {
-            robot.openClaw();
+        robot.flip(leftStick);
+        if(gamepad2.dpad_down)
+            robot.levelZero();
+        else if(gamepad2.dpad_right)
+            robot.levelOne();
+        else if(gamepad2.dpad_left)
+            robot.levelTwo();
+        else if(gamepad2.dpad_up)
+            robot.levelThree();
+
+        if (gamepad2.left_bumper||gamepad2.right_bumper) {
+            if(wheelRun == 0) {
+                robot.intake();
+                wheelRun = 1;
+            }
+            else{
+                robot.stopIntake();
+                wheelRun = 0;
+            }
         }
 
-        if (gamepad2.dpad_up) robot.jewelUp();
-        else if (gamepad2.dpad_down) robot.jewelDown();
-        else if (gamepad2.dpad_left) robot.jewelMid();
     }
     @Override
     public void loop() {

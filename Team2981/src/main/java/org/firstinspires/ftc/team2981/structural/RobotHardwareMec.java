@@ -124,7 +124,7 @@ public class RobotHardwareMec {
         bL.setPower(v[3] * DRIVE_SCALE);
 
         return new double[]{f, s, hyp, theta * 180 / Math.PI, v[0], v[1], v[2], v[3]};
-    }
+}
 
     private double[] normalize(double[] values) {
         double max = Math.abs(values[0]);

@@ -8,34 +8,34 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+// Jace is dumb
+
 import org.firstinspires.ftc.team3819.Structural.RobotHardware;
 
 /**
  * Created by 200409273 on 12/14/2017.
  */
-
-@Autonomous(name="AutoBlue3819",group="Auto")
-public class AutoBlue extends LinearOpMode {
+@Autonomous(name="AutoBlue2",group="Auto")
+public class AutoBlue2 extends LinearOpMode {
 
     private RobotHardware robot = null;
     private ModernRoboticsI2cColorSensor color = null;
     private ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    int team = 1;
-
+    int team = -1;
+/*
     public void initialize() {
         robot = new RobotHardware(hardwareMap);
-        color = (ModernRoboticsI2cColorSensor) hardwareMap.get(ColorSensor.class, "color");
-
         robot.init();
+        color = (ModernRoboticsI2cColorSensor) hardwareMap.get(ColorSensor.class, "color");
     }
-
+*/
     @Override
     public void runOpMode() throws InterruptedException {
-        initialize();
+/*        initialize();
         robot.jewelUp();
         waitForStart();
 
-        sleep(500);
+
         int blue=0, red=0, count=0;
 
         robot.jewelDown();
@@ -47,11 +47,6 @@ public class AutoBlue extends LinearOpMode {
             sleep(100);
         }
 
-        /*
-        **   GET FOTIH TO
-        **   SHOW ME VUPHORIA
-        */
-
         telemetry.addLine("Blue: " + Integer.valueOf(blue));
         telemetry.addLine("Red: " + Integer.valueOf(red));
         telemetry.addLine("Count: " + Integer.valueOf(count));
@@ -60,34 +55,55 @@ public class AutoBlue extends LinearOpMode {
         blue /= count;
         red /= count;
         if(blue>red) {
-            robot.driveDistIn(4,-.2*team);
+            robot.driveLeft(.1*team);
+            robot.driveRight(-.1*team);
+            sleep(750);
+            robot.stop();
+            sleep(500);
             robot.jewelUp();
-            sleep(500);
-            robot.driveDistIn(4,.2*team);
-            sleep(500);
-            robot.driveDistFt(2,.75*team);
+            sleep(200);
+            //robot.driveLeft(-.1*team);
+            robot.driveRight(.1*team);
+            sleep(750);
             robot.stop();
         }
         else {
-            robot.driveDistIn(4,.2*team);
+            robot.driveLeft(-.1*team);
+            robot.driveRight(.1*team);
+            sleep(750);
+            robot.stop();
+            sleep(500);
             robot.jewelUp();
+            sleep(200);
+            robot.driveLeft(.1*team);
+            robot.driveRight(-.1*team);
+            sleep(850);
+            robot.stop();
             sleep(500);
-            robot.driveDistIn(4,-.2*team);
-            sleep(500);
-            robot.driveDistFt(2,-.75*team);
+            robot.stop();
         }
+        robot.drive(.25*team);
+        sleep(750);
+        robot.stop();
+        sleep(500);
+        robot.driveLeft(-.5*team);
+        robot.driveRight(.5*team);
+        sleep(1500);
+        robot.stop();
 
-        robot.driveLeft(.25);
-        sleep(1500);           //turn to wall @ angle
+        sleep(500);
+        robot.drive(.1*team);
 
-        robot.stop();                       //
-        sleep(500);             //
-        robot.driveDistIn(10,.1);   // Pushed cube in, backs up, pushes again, backs up
-        robot.driveDistIn(5,-.1);   //
-        robot.driveDistIn(5,.1);    //
-        sleep(500);            //
-        robot.driveDistIn(4,-.1);  //
-
-*/
-    }
+        sleep(500);
+        robot.drive(.2);
+        sleep(750);
+        robot.turn(.1);
+        sleep(200);
+        robot.drive(-.1);
+        sleep(4000);
+        robot.stop();
+        sleep(500);
+        robot.drive(.1);
+        sleep(500);
+  */  }
 }
