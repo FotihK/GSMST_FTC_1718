@@ -22,16 +22,16 @@ public class AutoBlue2 extends LinearOpMode {
     private ModernRoboticsI2cColorSensor color = null;
     private ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int team = -1;
-/*
+
     public void initialize() {
         robot = new RobotHardware(hardwareMap);
         robot.init();
         color = (ModernRoboticsI2cColorSensor) hardwareMap.get(ColorSensor.class, "color");
     }
-*/
+
     @Override
     public void runOpMode() throws InterruptedException {
-/*        initialize();
+        initialize();
         robot.jewelUp();
         waitForStart();
 
@@ -55,55 +55,40 @@ public class AutoBlue2 extends LinearOpMode {
         blue /= count;
         red /= count;
         if(blue>red) {
-            robot.driveLeft(.1*team);
-            robot.driveRight(-.1*team);
-            sleep(750);
-            robot.stop();
+            robot.driveDistIn(-4, .2);
             sleep(500);
             robot.jewelUp();
             sleep(200);
-            //robot.driveLeft(-.1*team);
-            robot.driveRight(.1*team);
-            sleep(750);
-            robot.stop();
+            robot.driveDistIn(4, .2);
         }
         else {
-            robot.driveLeft(-.1*team);
-            robot.driveRight(.1*team);
-            sleep(750);
-            robot.stop();
+            robot.driveDistIn(4, .2);
             sleep(500);
             robot.jewelUp();
             sleep(200);
-            robot.driveLeft(.1*team);
-            robot.driveRight(-.1*team);
-            sleep(850);
-            robot.stop();
-            sleep(500);
-            robot.stop();
+            robot.driveDistIn(-4, .2);
         }
-        robot.drive(.25*team);
-        sleep(750);
-        robot.stop();
-        sleep(500);
-        robot.driveLeft(-.5*team);
-        robot.driveRight(.5*team);
-        sleep(1500);
-        robot.stop();
 
+        robot.driveDistIn(30, .75);
         sleep(500);
-        robot.drive(.1*team);
+        robot.left();
+        if(place==0)
+            robot.driveDistIn(27*team, .75);
+        else if(place==1)
+            robot.driveDistIn(34*team, .75);
+        else
+            robot.driveDistIn(42*team,.75);
 
-        sleep(500);
-        robot.drive(.2);
-        sleep(750);
-        robot.turn(.1);
-        sleep(200);
-        robot.drive(-.1);
-        sleep(4000);
-        robot.stop();
-        sleep(500);
-        robot.drive(.1);
-        sleep(500);
-  */  }
+        robot.left();
+
+        robot.flip(.5);
+        sleep(500);             //flips cube off
+        robot.flip(0);
+
+        sleep(500);             //
+        robot.driveDistIn(5,.1);   // Pushed cube in, backs up, pushes again, backs up
+        robot.driveDistIn(-5,.1);   //
+        robot.driveDistIn(5,.1);   //
+        robot.driveDistIn(-4,.1);  //
+      }
 }

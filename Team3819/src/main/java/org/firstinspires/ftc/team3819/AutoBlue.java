@@ -21,6 +21,7 @@ public class AutoBlue extends LinearOpMode {
     private ModernRoboticsI2cColorSensor color = null;
     private ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int team = 1;
+    int place = 0;
 
     public void initialize() {
         robot = new RobotHardware(hardwareMap);
@@ -60,33 +61,39 @@ public class AutoBlue extends LinearOpMode {
         blue /= count;
         red /= count;
         if(blue>red) {
-            robot.driveDistIn(4,-.2*team);
+            robot.driveDistIn(-4*team,.2);
             robot.jewelUp();
             sleep(500);
-            robot.driveDistIn(4,.2*team);
+            robot.driveDistIn(4*team,.2);
             sleep(500);
-            robot.driveDistFt(2,.75*team);
-            robot.stop();
         }
-        else {
-            robot.driveDistIn(4,.2*team);
+        else { //27 34 42
+            robot.driveDistIn(4*team,.2);
             robot.jewelUp();
             sleep(500);
-            robot.driveDistIn(4,-.2*team);
+            robot.driveDistIn(-4*team,.2);
             sleep(500);
-            robot.driveDistFt(2,-.75*team);
         }
 
-        robot.driveLeft(.25);
-        sleep(1500);           //turn to wall @ angle
+        if(place==0)
+            robot.driveDistIn(27*team, .75);
+        else if(place==1)
+            robot.driveDistIn(34*team, .75);
+        else
+            robot.driveDistIn(42*team,.75);
 
-        robot.stop();                       //
+        robot.left();
+
+        robot.flip(.5);
+        sleep(500);             //flips cube off
+        robot.flip(0);
+
         sleep(500);             //
         robot.driveDistIn(10,.1);   // Pushed cube in, backs up, pushes again, backs up
-        robot.driveDistIn(5,-.1);   //
+        robot.driveDistIn(-5,.1);   //
         robot.driveDistIn(5,.1);    //
         sleep(500);            //
-        robot.driveDistIn(4,-.1);  //
+        robot.driveDistIn(-4,.1);  //
 
 */
     }

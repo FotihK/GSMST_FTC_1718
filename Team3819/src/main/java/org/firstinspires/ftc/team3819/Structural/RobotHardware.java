@@ -162,49 +162,45 @@ public class RobotHardware {
         fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fR.setTargetPosition(counts);
         fL.setTargetPosition(counts);
-        while(fR.getCurrentPosition()>= counts || fL.getCurrentPosition() >= counts) {
-            fR.setPower(p);
-            fL.setPower(p);
-            bL.setPower(p);
-            bR.setPower(p);
-        }
+        if (counts < 0)
+            while (fR.getCurrentPosition() <= counts || fL.getCurrentPosition() <= counts) {
+                drive(p, 0, 0);
+            }
+        else
+            while (fR.getCurrentPosition() >= counts || fL.getCurrentPosition() >= counts) {
+                drive(-p, 0, 0);
+            }
         stop();
+        resetEnc();
     }
 
-    public void driveDistFt(double ft, double p) {  // send dist and speed
-        double counts = CPF * ft;
+    public void right() {
+        double counts = CPI * 12;
+        fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fR.setTargetPosition(-counts);
+        fL.setTargetPosition(counts);
+        while(fR.getCurrentPosition()>= counts || fL.getCurrentPosition() <= counts) {
+            drive(0,0,1);
+        }
+        stop();
+        resetEnc();
+    }
+
+    public void left() {
+        double counts = CPI * 12;
         fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fR.setTargetPosition(counts);
-        fL.setTargetPosition(counts);
-        while(fR.getCurrentPosition()>= counts || fL.getCurrentPosition() >= counts) {
-            fR.setPower(p);
-            fL.setPower(p);
-            bL.setPower(p);
-            bR.setPower(p);
+        fL.setTargetPosition(-counts);
+        while(fR.getCurrentPosition()<= counts || fL.getCurrentPosition() >= counts) {
+            drive(0,0,-1);
         }
         stop();
+        resetEnc();
     }
 
-    public void driveLeft(double power) {
-        power = Range.clip(power, -1, 1);
-            fL.setPower(power);
-    }
-
-    public void drive (double power) {
-        power = Range.clip(power, -1, 1);
-        fL.setPower(power);
-        fR.setPower(power);
-        bL.setPower(power);
-        bR.setPower(power);
-    }
-
-    public void driveRight(double power){
-        power = Range.clip(power, -1, 1);
-        fR.setPower(power);
-    }
-
-public double[] drive(Gamepad gp) {
+    public double[] drive(Gamepad gp) {
         double leftY = -gp.left_stick_y;
         double leftX = gp.left_stick_x;
         double rightX = gp.right_stick_x;
