@@ -22,7 +22,7 @@ public class RobotHardwareMec {
     private HardwareMap map = null;
     private DcMotor fL = null, fR = null, bL = null, bR = null;
     private CRServo intakeLeft = null, intakeRight = null;
-    private DcMotor conveyorLeft = null, conveyorRight = null;
+    private CRServo conveyorLeft = null, conveyorRight = null;
     private DcMotor liftLeft = null;
     private DcMotor liftRight = null;
     private Servo jewel = null;
@@ -38,8 +38,8 @@ public class RobotHardwareMec {
     private final double INTAKE_POWER = 0.55;
     private final double LIFT_POWER = 0.7;
     private final double LIFT_RATIO = 0.945;     //right over left
-    private final double JEWEL_UP = 0.025;
-    private final double JEWEL_DOWN = 0.505;
+    private final double JEWEL_UP = 0.95;
+    private final double JEWEL_DOWN = 0.43;
     private final double DRIVE_SCALE = 1;
 
     public RobotHardwareMec(HardwareMap hwMap) {
@@ -55,8 +55,8 @@ public class RobotHardwareMec {
         intakeLeft = map.get(CRServo.class, "intakeLeft");
         intakeRight = map.get(CRServo.class, "intakeRight");
 
-        conveyorLeft = map.get(DcMotor.class, "conveyorLeft");
-        conveyorRight = map.get(DcMotor.class, "conveyorRight");
+        conveyorLeft = map.get(CRServo.class, "conveyorLeft");
+        conveyorRight = map.get(CRServo.class, "conveyorRight");
 
         liftLeft = map.get(DcMotor.class, "liftLeft");
         liftRight = map.get(DcMotor.class, "liftRight");
@@ -68,19 +68,13 @@ public class RobotHardwareMec {
         fL.setDirection(DcMotorSimple.Direction.REVERSE);
         bL.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setEncMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         intakeRight.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         conveyorLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         conveyorRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        conveyorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        conveyorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         liftRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -119,12 +113,42 @@ public class RobotHardwareMec {
         v = normalize(v);
 
         fR.setPower(v[0] * DRIVE_SCALE);
-        fL.setPower(v[1] * DRIVE_SCALE);
+        bL.setPower(v[1] * DRIVE_SCALE);
         bR.setPower(v[2] * DRIVE_SCALE);
-        bL.setPower(v[3] * DRIVE_SCALE);
+        fL.setPower(v[3] * DRIVE_SCALE);
 
         return new double[]{f, s, hyp, theta * 180 / Math.PI, v[0], v[1], v[2], v[3]};
 }
+
+    public void forwardEnc(double power, int dist){    //1000 is 11.25 inches
+        resetEnc();
+        setEncMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int target = (int) (dist * (1000 / 11.25) * -(int) Math.signum(power));
+        setEncTarget(target);
+        drive(power, 0 ,0);
+    }
+
+    public void strafeEnc(double power, int dist){     //1000 is 9.25 inches
+        resetEnc();
+        setEncMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int target = (int) (dist * (1000 / 9.25) * -(int) Math.signum(power));
+        fL.setTargetPosition(target);
+        bL.setTargetPosition(-target);
+        fR.setTargetPosition(-target);
+        bR.setTargetPosition(target);
+        drive(0, power, 0);
+    }
+
+    public void turnEnc(double power, int angle){           //2020 is 90 degrees
+        resetEnc();
+        setEncMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int target = (int) (angle * (2020/90.0) * -(int) Math.signum(power));
+        fL.setTargetPosition(target);
+        bL.setTargetPosition(target);
+        fR.setTargetPosition(-target);
+        bR.setTargetPosition(-target);
+        drive(0, 0, power);
+    }
 
     private double[] normalize(double[] values) {
         double max = Math.abs(values[0]);
@@ -244,6 +268,28 @@ public class RobotHardwareMec {
                 liftRight.setPower(-LIFT_POWER);
                 break;
         }
+    }
+
+    public void setEncMode(DcMotor.RunMode mode){
+        fR.setMode(mode);
+        bR.setMode(mode);
+        fL.setMode(mode);
+        bL.setMode(mode);
+    }
+
+    public void resetEnc(){
+        setEncMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    public void setEncTarget(int ticks){
+        fR.setTargetPosition(ticks);
+        bR.setTargetPosition(ticks);
+        fL.setTargetPosition(ticks);
+        bL.setTargetPosition(ticks);
+    }
+
+    public boolean isBusy(){
+        return fL.isBusy() || fR.isBusy() || bL.isBusy() || bR.isBusy();
     }
 
     public void jewelDown() {
