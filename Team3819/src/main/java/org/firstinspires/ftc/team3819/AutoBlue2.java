@@ -22,11 +22,18 @@ public class AutoBlue2 extends LinearOpMode {
     private ModernRoboticsI2cColorSensor color = null;
     private ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     int team = -1;
+    int place = 0;
 
     public void initialize() {
         robot = new RobotHardware(hardwareMap);
         robot.init();
         color = (ModernRoboticsI2cColorSensor) hardwareMap.get(ColorSensor.class, "color");
+    }
+
+    public void idler() {
+        while (robot.isBusy() && opModeIsActive())
+            idle();
+        stop();
     }
 
     @Override
@@ -35,17 +42,20 @@ public class AutoBlue2 extends LinearOpMode {
         robot.jewelUp();
         waitForStart();
 
+        sleep(500);
 
-        int blue=0, red=0, count=0;
+        int blue = 0, red = 0, count = 0;
 
         robot.jewelDown();
         time.reset();
-        while(time.milliseconds() < 2000){
+        while (time.milliseconds() < 2000) {
             blue += color.blue();
             red += color.red();
             count++;
             sleep(100);
         }
+
+        String place = robot.vuphoria(); //read Image
 
         telemetry.addLine("Blue: " + Integer.valueOf(blue));
         telemetry.addLine("Red: " + Integer.valueOf(red));
@@ -54,41 +64,59 @@ public class AutoBlue2 extends LinearOpMode {
 
         blue /= count;
         red /= count;
-        if(blue>red) {
-            robot.driveDistIn(-4, .2);
-            sleep(500);
-            robot.jewelUp();
+        if (blue > red) {
+            robot.driveDistIn(-4 * team, .2);
+            idler();
             sleep(200);
-            robot.driveDistIn(4, .2);
-        }
-        else {
-            robot.driveDistIn(4, .2);
-            sleep(500);
             robot.jewelUp();
+            sleep(500);
+            robot.driveDistIn(4 * team, .2);
+            idler();
+            sleep(500);
+        } else { //27 34 42
+            robot.driveDistIn(4 * team, .2);
+            idler();
             sleep(200);
-            robot.driveDistIn(-4, .2);
+            robot.jewelUp();
+            sleep(500);
+            robot.driveDistIn(-4 * team, .2);
+            idler();
+            sleep(500);
         }
 
-        robot.driveDistIn(30, .75);
-        sleep(500);
-        robot.left();
-        if(place==0)
-            robot.driveDistIn(27*team, .75);
-        else if(place==1)
-            robot.driveDistIn(34*team, .75);
-        else
-            robot.driveDistIn(42*team,.75);
+        robot.driveDistIn(28, .5);
+        idler();
+        robot.right();                               //moves off platform & rotates
+        idler();
 
-        robot.left();
+        if ((place.equals("left") && team == -1) || (place.equals("right") && team == 1)) {
+            robot.driveDistIn(6 * team, .75);
+            idler();
+        } else if (place.equals("center")) {
+            robot.driveDistIn(13 * team, .75);
+            idler();
+        } else {
+            robot.driveDistIn(20 * team, .75);
+            idler();
+        }
+
+        robot.right();  //rotates to have back face grid
+        idler();
 
         robot.flip(.5);
-        sleep(500);             //flips cube off
+        sleep(750);             //flips cube off
+        robot.flip(-.8);
+        sleep(700);
         robot.flip(0);
 
-        sleep(500);             //
-        robot.driveDistIn(5,.1);   // Pushed cube in, backs up, pushes again, backs up
-        robot.driveDistIn(-5,.1);   //
-        robot.driveDistIn(5,.1);   //
-        robot.driveDistIn(-4,.1);  //
-      }
+        robot.driveDistIn(6,.5);
+        idler();
+        robot.driveDistIn(-4,.5);   //pushes in multiple times
+        idler();
+        robot.driveDistIn(5,.5);
+        idler();
+        robot.driveDistIn(-4,.5);
+        idler();
+
+    }
 }

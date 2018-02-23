@@ -1,11 +1,19 @@
 package org.firstinspires.ftc.team3819.Structural;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
 import java.util.Timer;
 
 /**
@@ -18,18 +26,24 @@ public class RobotHardware {
 
     public DcMotor  fL = null, fR = null, bL = null, bR = null, flipR = null, flipL = null;                //Drive Motors
     private DcMotor  rLift = null, lLift = null;
-    private Servo    jewel = null, rWheel = null, lWheel = null;
+    private Servo    jewel = null;
+    private CRServo  rWheel = null, lWheel = null;
+    VuforiaLocalizer vuforia;
+    VuforiaTrackables relicTrackables;
+    VuforiaTrackable relicTemplate;
+    VuforiaLocalizer.Parameters parameters;
 
     private static final int       CPR = 1120;                                 //encoder counts per revolution
     private static final double    DIAMETER = 4;                               //encoded drive wheel diameter (in)
     private static final double    GEARING = 1;
     public static final double     CPI = (CPR * GEARING) / (DIAMETER * 3.14);
     public static final double     CPF = CPI * 12;
-    public static int               position = 0;
+    public static double           position = -.5;
 
 
-    private final double    JEWEL_UP = 0;
-    private final double    JEWEL_DOWN = .55;
+
+    private final double    JEWEL_UP = .55;
+    private final double    JEWEL_DOWN = 0;
     private final double    JEWEL_MID = .25;
     private final double DRIVE_SCALE = 1;
     private final int wheelRun = 0;
@@ -39,16 +53,6 @@ public class RobotHardware {
     }
 
     public void init(){
-        fL.setDirection(DcMotorSimple.Direction.FORWARD);
-        fR.setDirection(DcMotorSimple.Direction.REVERSE);
-        bL.setDirection(DcMotorSimple.Direction.FORWARD);
-        bR.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        rLift.setDirection(DcMotorSimple.Direction.REVERSE);
-        lLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        flipR.setDirection(DcMotorSimple.Direction.REVERSE);
-        flipL.setDirection(DcMotorSimple.Direction.FORWARD);
-
         fL = map.get(DcMotor.class, "fL");
         fR = map.get(DcMotor.class, "fR");
         bL = map.get(DcMotor.class, "bL");
@@ -59,15 +63,74 @@ public class RobotHardware {
         flipL = map.get(DcMotor.class, "flipL");
 
         jewel = map.get(Servo.class, "jewel");
-        rWheel = map.get(Servo.class, "rWheel");
-        lWheel = map.get(Servo.class, "lWheel");
 
-        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rWheel = map.get(CRServo.class, "rWheel");
+        lWheel = map.get(CRServo.class, "lWheel");
 
-        resetEnc();
+        fL.setDirection(DcMotorSimple.Direction.REVERSE);
+        fR.setDirection(DcMotorSimple.Direction.FORWARD);
+        bL.setDirection(DcMotorSimple.Direction.REVERSE);
+        bR.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        rLift.setDirection(DcMotorSimple.Direction.REVERSE);
+        lLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        flipR.setDirection(DcMotorSimple.Direction.REVERSE);
+        flipL.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        int cameraMonitorViewId = map.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", map.appContext.getPackageName());
+        parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = "AaDxUz3/////AAAAGSJYyeGWDU3Im6rx85GbYy5gq8Raja7mkDAmDCUs6BvNAusEF4omrCaZUFeEG7gyW/Sq1exxlBmowJ4IY2ICrleyyxb1XJaFw0IsYhuBzESI/duL9SW2gVXcULoqBd7q4wniSHWZNNlkMYiuSbaW6z7299VJzV0QEi0HugnY+5PhZHUts9CU+lGIukrkAIDWP5bXOEmERBRpl4XKWIviWeCGHiVQVwAjeBEPnX1fsqRf+178gAoXEXDanp9cHriUGyU4a0vqhvJyb2LoQG5NrNLoFGUMU45pTWdjjY8TuVv9sfYSVwcboP2vzFeh8TVBbQRJrNrdWiRbw35nn+JSrZY6ulR5ZSDTq7l1apzxTy/s\n";
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+        vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+        relicTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
+        relicTemplate.setName("relicVuMarkTemplate");
+        relicTrackables.activate();
+
+    }
+
+    public void initTele(){
+        fL = map.get(DcMotor.class, "fL");
+        fR = map.get(DcMotor.class, "fR");
+        bL = map.get(DcMotor.class, "bL");
+        bR = map.get(DcMotor.class, "bR");
+        rLift = map.get(DcMotor.class, "rLift");
+        lLift = map.get(DcMotor.class, "lLift");
+        flipR = map.get(DcMotor.class, "flipR");
+        flipL = map.get(DcMotor.class, "flipL");
+
+        jewel = map.get(Servo.class, "jewel");
+
+        rWheel = map.get(CRServo.class, "rWheel");
+        lWheel = map.get(CRServo.class, "lWheel");
+
+        fL.setDirection(DcMotorSimple.Direction.REVERSE);
+        fR.setDirection(DcMotorSimple.Direction.FORWARD);
+        bL.setDirection(DcMotorSimple.Direction.REVERSE);
+        bR.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        rLift.setDirection(DcMotorSimple.Direction.REVERSE);
+        lLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        flipR.setDirection(DcMotorSimple.Direction.REVERSE);
+        flipL.setDirection(DcMotorSimple.Direction.FORWARD);
+
+    }
+
+    public String vuphoria() {
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        return vuMark.toString();
+    }
+
+    public int[] getEncoders() {
+        int[] a = new int[2];
+        a[0] = fR.getCurrentPosition();
+        a[1] = fL.getCurrentPosition();
+        return a;
+    }
+
+    public void testLift(double power) {
+        rLift.setPower(power);
+        lLift.setPower(power);
     }
 
     public void levelZero() {
@@ -77,8 +140,8 @@ public class RobotHardware {
         lLift.setTargetPosition(0);
         rLift.setTargetPosition(0);
 
-        lLift.setPower(-.2);
-        rLift.setPower(-.2);
+        lLift.setPower(-.6);
+        rLift.setPower(-.6);
 
         position = 0;
     }
@@ -89,13 +152,14 @@ public class RobotHardware {
 
         lLift.setTargetPosition(360);
         rLift.setTargetPosition(360);
+
         if(position>1) {
-            lLift.setPower(-.2);
-            rLift.setPower(-.2);
+            lLift.setPower(-.6);
+            rLift.setPower(-.6);
         }
         else {
-            lLift.setPower(.2);
-            rLift.setPower(.2);
+            lLift.setPower(.6);
+            rLift.setPower(.6);
         }
 
 
@@ -108,13 +172,14 @@ public class RobotHardware {
 
         lLift.setTargetPosition(720);
         rLift.setTargetPosition(720);
+
         if(position>2) {
-            lLift.setPower(-.2);
-            rLift.setPower(-.2);
+            lLift.setPower(-.6);
+            rLift.setPower(-.6);
         }
         else {
-            lLift.setPower(.2);
-            rLift.setPower(.2);
+            lLift.setPower(.6);
+            rLift.setPower(.6);
         }
 
 
@@ -127,13 +192,14 @@ public class RobotHardware {
 
         lLift.setTargetPosition(1080);
         rLift.setTargetPosition(1080);
+
         if(position>3) {
-            lLift.setPower(-.2);
-            rLift.setPower(-.2);
+            lLift.setPower(-.6);
+            rLift.setPower(-.6);
         }
         else {
-            lLift.setPower(.2);
-            rLift.setPower(.2);
+            lLift.setPower(.6);
+            rLift.setPower(.6);
         }
 
 
@@ -141,69 +207,79 @@ public class RobotHardware {
     }
 
     public void intake(){
-            rWheel.setPosition(.8);
-            lWheel.setPosition(-.8);
+            rWheel.setPower(-1);
+            lWheel.setPower(1);
+    }
+
+    public void outtake() {
+        rWheel.setPower(1);
+        lWheel.setPower(-1);
     }
 
     public void stopIntake(){
-        rWheel.setPosition(0);
-        lWheel.setPosition(0);
+        rWheel.setPower(0);
+        lWheel.setPower(0);
     }
 
     public void flip(double power) {
         power = Range.clip(power, -1, 1);
-        flipR.setPower(power/2);
-        flipL.setPower(power/2);
+        if(power<0) {
+            flipR.setPower(power / 2);
+            flipL.setPower(power / 2);
+        }
+        else {
+            flipR.setPower(power / 6);
+            flipL.setPower(power / 6);
+        }
     }
 
     public void driveDistIn(double in, double p) {  // send dist and speed
-        double counts = CPI * in;
+        resetEnc();
+
+        int counts = (int) (CPI * in);
         fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fR.setTargetPosition(counts);
         fL.setTargetPosition(counts);
+
         if (counts < 0)
-            while (fR.getCurrentPosition() <= counts || fL.getCurrentPosition() <= counts) {
-                drive(p, 0, 0);
-            }
+            drive(-p);
         else
-            while (fR.getCurrentPosition() >= counts || fL.getCurrentPosition() >= counts) {
-                drive(-p, 0, 0);
-            }
-        stop();
-        resetEnc();
+            drive(p);
+    }
+
+    public boolean isBusy() {
+        return fL.isBusy() || fR.isBusy();
+    }
+
+    public boolean liftIsBusy() {
+        return lLift.isBusy() || rLift.isBusy();
     }
 
     public void right() {
-        double counts = CPI * 12;
+        resetEnc();
+        int counts = (int)(CPI * 12);
         fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fR.setTargetPosition(-counts);
         fL.setTargetPosition(counts);
-        while(fR.getCurrentPosition()>= counts || fL.getCurrentPosition() <= counts) {
-            drive(0,0,1);
-        }
-        stop();
-        resetEnc();
+        drive(0,0,1);
     }
 
     public void left() {
-        double counts = CPI * 12;
+        resetEnc();
+        int counts = (int)(CPI * 12);
         fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fR.setTargetPosition(counts);
         fL.setTargetPosition(-counts);
-        while(fR.getCurrentPosition()<= counts || fL.getCurrentPosition() >= counts) {
-            drive(0,0,-1);
-        }
-        stop();
-        resetEnc();
+        drive(0,0,-1);
     }
 
     public double[] drive(Gamepad gp) {
         double leftY = -gp.left_stick_y;
         double leftX = gp.left_stick_x;
-        double rightX = gp.right_stick_x;
+        double rightX = -gp.right_stick_x;
         leftY = Math.abs(leftY) > 0.03 ? leftY : 0;
         leftX = Math.abs(leftX) > 0.03 ? leftX : 0;
         rightX = Math.abs(rightX) > 0.03 ? rightX : 0;
@@ -212,8 +288,15 @@ public class RobotHardware {
         return drive(scale(leftY, a), scale(leftX, a), scale(rightX, a));
     }
 
+    public void drive(double power) {
+        fR.setPower(power);
+        fL.setPower(power);
+        bR.setPower(power);
+        bL.setPower(power);
+    }
+
     public double[] drive(double forward, double strafe, double turn) {
-        double f = -Range.clip(forward, -1, 1);
+        double f = Range.clip(forward, -1, 1);
         double s = Range.clip(strafe, -1, 1);
         double t = Range.clip(turn, -1, 1);
 
@@ -228,14 +311,20 @@ public class RobotHardware {
 
         v = normalize(v);
 
-        fR.setPower(v[0] * DRIVE_SCALE);
+        bR.setPower(v[0] * DRIVE_SCALE);
         fL.setPower(v[1] * DRIVE_SCALE);
-        bR.setPower(v[2] * DRIVE_SCALE);
+        fR.setPower(v[2] * DRIVE_SCALE);
         bL.setPower(v[3] * DRIVE_SCALE);
 
         return new double[]{f, s, hyp, theta * 180 / Math.PI, v[0], v[1], v[2], v[3]};
     }
 
+    public void drive(double a, double b) {
+        bL.setPower(a);
+        fL.setPower(a);
+        bR.setPower(b);
+        fR.setPower(b);
+    }
     private double[] normalize(double[] values) {
         double max = Math.abs(values[0]);
         for (double val : values) if (Math.abs(val) > max) max = Math.abs(val);
@@ -252,26 +341,15 @@ public class RobotHardware {
     }
 
     public void stop() {
-        drive(0);
-    }
-
-    public void turn(double power){     //positive for turn left, negative for turn right
-        driveLeft(-power);
-        driveRight(power);
-    }
-
-    public boolean driveIsBusy(){
-        return fL.isBusy() || fR.isBusy();
+        fR.setPower(0);
+        fL.setPower(0);
+        bR.setPower(0);
+        bL.setPower(0);
     }
 
     public void resetEnc(){
         fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        lLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
 
