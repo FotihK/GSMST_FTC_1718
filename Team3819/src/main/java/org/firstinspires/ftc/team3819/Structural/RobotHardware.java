@@ -42,9 +42,9 @@ public class RobotHardware {
 
 
 
-    private final double    JEWEL_UP = .55;
-    private final double    JEWEL_DOWN = 0;
-    private final double    JEWEL_MID = .25;
+    private final double    JEWEL_UP = 1;
+    private final double    JEWEL_DOWN = .35;
+    private final double    JEWEL_MID = .8;
     private final double DRIVE_SCALE = 1;
     private final int wheelRun = 0;
 
@@ -258,22 +258,39 @@ public class RobotHardware {
 
     public void right() {
         resetEnc();
-        int counts = (int)(CPI * 12);
-        fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int counts = (int)(CPI * 16);
+        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fR.setTargetPosition(-counts);
         fL.setTargetPosition(counts);
-        drive(0,0,1);
+        drive(0,0,.5);
     }
 
     public void left() {
         resetEnc();
-        int counts = (int)(CPI * 12);
-        fR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        int counts = (int)(CPI * 16);
+        fR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fR.setTargetPosition(counts);
         fL.setTargetPosition(-counts);
-        drive(0,0,-1);
+        drive(0,0,-.5);
+    }
+
+    public void noEncode() {
+        fR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void encode() {
+        fR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void spin(double power) {
+        fR.setPower(-power);
+        bR.setPower(-power);
+        fL.setPower(power);
+        bL.setPower(power);
     }
 
     public double[] drive(Gamepad gp) {

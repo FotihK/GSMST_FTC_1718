@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class AutoRed2 extends AutoBlue2 {
     @Override
     public void runOpMode() throws InterruptedException {
-        team = 1;
+        team = -1;
         super.runOpMode();
     }
 }

@@ -20,8 +20,9 @@ public class AutoBlue extends LinearOpMode {
     private RobotHardware robot = null;
     private ModernRoboticsI2cColorSensor color = null;
     private ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    int team = -1;
+    int team = 1;
     int place = 0;
+    String key = null;
 
     public void initialize() {
         robot = new RobotHardware(hardwareMap);
@@ -30,9 +31,10 @@ public class AutoBlue extends LinearOpMode {
      }
 
      public void idler() {
-        while (robot.isBusy() && opModeIsActive())
+        time.reset();
+        while (robot.isBusy() && opModeIsActive() && time.milliseconds()<3000)
         {idle();}
-        stop();
+        robot.stop();
      }
 
     @Override
@@ -41,7 +43,26 @@ public class AutoBlue extends LinearOpMode {
         robot.jewelUp();
         waitForStart();
 
-        sleep(500);
+        robot.intake();
+        sleep(750);
+        robot.stopIntake();
+        key = robot.vuphoria().toLowerCase();
+
+        robot.noEncode();
+        robot.drive(0,0,.2);
+        sleep(600);
+        robot.stop();
+        sleep(200);
+        time.reset();
+        while(time.milliseconds()<2000 && key.equals("unknown")&&opModeIsActive())
+            key = robot.vuphoria().toLowerCase(); //read Image
+        sleep(200);
+        robot.drive(0,0,-.2);
+        sleep(600);
+        robot.stop();
+        sleep(200);
+        robot.encode();
+
 
         int blue=0, red=0, count=0;
 
@@ -54,66 +75,74 @@ public class AutoBlue extends LinearOpMode {
             sleep(100);
         }
 
-        String place = robot.vuphoria(); //read Image
-
         telemetry.addLine("Blue: " + Integer.valueOf(blue));
         telemetry.addLine("Red: " + Integer.valueOf(red));
         telemetry.addLine("Count: " + Integer.valueOf(count));
+        telemetry.addLine(key);
         telemetry.update();
 
         blue /= count;
         red /= count;
         if(blue>red) {
-            robot.driveDistIn(-4*team,.2);
+            robot.driveDistIn(-2*team,.3);
             idler();
             sleep(200);
             robot.jewelUp();
             sleep(500);
-            robot.driveDistIn(4*team,.2);
+            robot.driveDistIn(2*team,.3);
             idler();
             sleep(500);
         }
-        else { //27 34 42
-            robot.driveDistIn(4*team,.2);
+        else if(red>blue) { //27 34 42
+            robot.driveDistIn(3*team,.3);
             idler();
             sleep(200);
             robot.jewelUp();
             sleep(500);
-            robot.driveDistIn(-4*team,.2);
+            robot.driveDistIn(-3*team,.3);
             idler();
             sleep(500);
         }
+        else {}
 
-
-        if((place.equals("left")&&team==-1) || (place.equals("right")&&team==1)) {
-            robot.driveDistIn(27 * team, .75);
+        if((key.equals("left")&&team==1) || (key.equals("right")&&team==-1)) {
+            robot.driveDistIn(36 * team, .75);
             idler();
         }
-        else if(place.equals("center")) {
-            robot.driveDistIn(34 * team, .75);
+        else if(key.equals("center")) {
+            robot.driveDistIn(45 * team, .75);
+            idler();
+        }
+
+        else if((key.equals("right")&&team==1) || (key.equals("left")&&team==-1)) {
+            robot.driveDistIn(52 * team, .75);
             idler();
         }
         else {
-            robot.driveDistIn(42 * team, .75);
+            robot.driveDistIn(32 * team, .75);
             idler();
         }
 
-        robot.left();
-        idler();
+        robot.noEncode();
+        robot.drive(0,0,-1);
+        sleep(1150);
+        robot.stop();
+        robot.encode();
 
-        robot.flip(.5);
-        sleep(750);             //flips cube off
-        robot.flip(-.8);
-        sleep(700);
-        robot.flip(0);
+        sleep(1000);
+        robot.flip(-.7);
+        sleep(500);
+        robot.flip(.7);
+        sleep(1000);
+        robot.flip(0);//flips cube off
 
-        robot.driveDistIn(10,.5);
+        robot.driveDistIn(-11,.7);
         idler();
-        robot.driveDistIn(-5,.5);   //pushes in multiple times
+        robot.driveDistIn(5,.5);   //pushes in multiple times
         idler();
-        robot.driveDistIn(5,.5);
+        robot.driveDistIn(-5,.7);
         idler();
-        robot.driveDistIn(-4,.5);
+        robot.driveDistIn(4,.5);
         idler();
 
       }

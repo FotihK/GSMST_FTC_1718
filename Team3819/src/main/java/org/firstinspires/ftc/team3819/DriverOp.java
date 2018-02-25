@@ -42,8 +42,11 @@ public class DriverOp extends OpMode {
     private void driverTwo() {
         double leftStick = gamepad2.left_stick_y;
         leftStick = (Math.abs(leftStick) > 0.1 ? (leftStick) : 0);
+        double rightStick = gamepad2.right_stick_y;
+        rightStick = (Math.abs(rightStick) > 0.1 ? (rightStick) : 0);
 
-        robot.flip(leftStick);
+        robot.flip(rightStick/2);
+        robot.testLift(leftStick);
 
         if (gamepad2.dpad_down)
             robot.levelZero();

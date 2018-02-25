@@ -17,7 +17,7 @@ public class AutoRed extends AutoBlue {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        team = 1;
+        team = -1;
         super.runOpMode();
     }
 }
